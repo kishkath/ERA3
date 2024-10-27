@@ -1,4 +1,4 @@
-**Session2**:  : Python Essentials, Version Control, and Web Development Basics
+**Session2**::: Python Essentials, Version Control, and Web Development Basics
 
 * The session deals with:
   ----------------------
@@ -54,7 +54,7 @@
   Process:
   -------
   * The step by step process for creating a Server using AI.
-      * Prepare the scripts using the cursor/chatgpt.
+      * Set up the environment(conda/virutalenv) and then prepare the scripts using the cursor/chatgpt.
       * Finetune the prompt based on the requirement needed
         
               * Server Usage:
