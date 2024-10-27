@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Animal Information</title>
+    <link rel="stylesheet" href="static/styles.css">
+</head>
+<body>
+    <h1>Generate Animal Information</h1>
+    <div class="form-container">
+        <h3>Select Your Favorite Animal</h3>
+        <div class="checkbox-container">
+            <input type="checkbox" id="animal1" name="animal1" value="cat">
+            <label for="animal1">Cat</label>
+        </div>
+        <div class="checkbox-container">
+            <input type="checkbox" id="animal2" name="animal2" value="dog">
+            <label for="animal2">Dog</label>
+        </div>
+        <div class="checkbox-container">
+            <input type="checkbox" id="animal3" name="animal3" value="elephant">
+            <label for="animal3">Elephant</label>
+        </div>
+        
+        <br>
+        <br>
+        <h3>Or Upload an Image</h3>
+        <form id="upload-form" enctype="multipart/form-data">
+            <input type="file" id="user-image" accept="image/*" />
+            <button type="submit" id="submit">Submit</button>
+        </form>
+        <img id="image-preview" alt="Image Preview" style="display:none; margin-top: 10px; max-width: 25%; height: auto;" />
+        <div id="file-info" style="margin-top: 20px;"></div>
+        <div id="animal-info" style="margin-top: 20px;"></div>
+    </div>
+    <script src="static/script.js"></script>
+</body>
+</html>
