@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickSite Builder</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="jszip.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <h1>QuickSite Builder</h1>
+        <div id="greeting" class="step">
+            <h2>Welcome to QuickSite Builder!</h2>
+            <p>Let's create your personalized website in just a few steps.</p>
+            <button id="start-btn">Get Started</button>
+        </div>
+        <div id="website-type" class="step hidden">
+            <h2>What type of website are you creating?</h2>
+            <button class="type-btn" data-type="personal">Personal</button>
+            <button class="type-btn" data-type="professional">Professional</button>
+        </div>
+        <div id="user-details" class="step hidden">
+            <div id="personal-details" class="hidden">
+                <h2>Personal Website Details</h2>
+                <form id="personal-form">
+                    <label for="name">Name: *</label>
+                    <input type="text" id="name" name="name" required>
+
+                    <label for="bio">Bio: *</label>
+                    <textarea id="bio" name="bio" required></textarea>
+
+                    <label for="facebook">Facebook Link:</label>
+                    <input type="url" id="facebook" name="facebook_link">
+
+                    <label for="instagram">Instagram Link:</label>
+                    <input type="url" id="instagram" name="instagram_link">
+
+                    <label for="twitter">Twitter Link:</label>
+                    <input type="url" id="twitter" name="twitter_link">
+
+                    <label for="linkedin">LinkedIn Link:</label>
+                    <input type="url" id="linkedin" name="linkedin_link">
+
+                    <label for="email">Contact Email: *</label>
+                    <input type="email" id="email" name="contact_email" required>
+
+                    <label for="phone">Contact Phone:</label>
+                    <input type="tel" id="phone" name="contact_phone">
+                </form>
+            </div>
+            <div id="professional-details" class="hidden">
+                <h2>Professional Website Details</h2>
+                <form id="professional-form">
+                    <label for="full-name">Full Name: *</label>
+                    <input type="text" id="full-name" name="full_name" required>
+
+                    <label for="experience">Years of Experience: *</label>
+                    <input type="number" id="experience" name="years_of_experience" required>
+
+                    <label for="skills">Skills: *</label>
+                    <textarea id="skills" name="skills" placeholder="Separate skills with commas" required></textarea>
+
+                    <label for="interests">Interested In:</label>
+                    <textarea id="interests" name="interested_in" placeholder="List your interests"></textarea>
+
+                    <label for="companies">Companies Worked For:</label>
+                    <textarea id="companies" name="companies_worked_for" placeholder="One company per line"></textarea>
+
+                    <label for="prof-linkedin">LinkedIn Profile:</label>
+                    <input type="url" id="prof-linkedin" name="linkedin_profile">
+
+                    <label for="github">GitHub Profile:</label>
+                    <input type="url" id="github" name="github_profile">
+
+                    <label for="prof-email">Contact Email: *</label>
+                    <input type="email" id="prof-email" name="contact_email" required>
+
+                    <label for="prof-phone">Contact Phone:</label>
+                    <input type="tel" id="prof-phone" name="contact_phone">
+                </form>
+            </div>
+            <button id="details-next-btn">Next</button>
+        </div>
+        <div id="customization" class="step hidden">
+            <h2>Customize Your Website</h2>
+            <form id="customization-form">
+                <label for="theme">Theme:</label>
+                <select id="theme" name="theme">
+                    <option value="modern">Modern</option>
+                    <option value="classic">Classic</option>
+                    <option value="minimalist">Minimalist</option>
+                    <option value="bold">Bold</option>
+                </select>
+
+                <fieldset>
+                    <legend>Color Change:</legend>
+                    <input type="radio" id="color-yes" name="color_change" value="yes">
+                    <label for="color-yes">Yes</label>
+                    <input type="radio" id="color-no" name="color_change" value="no">
+                    <label for="color-no">No</label>
+                </fieldset>
+
+                <label for="color-palette">Color Palette:</label>
+                <select id="color-palette" name="color_palette">
+                    <option value="blue_&_white">Blue & White</option>
+                    <option value="black_&_gold">Black & Gold</option>
+                    <option value="green_&_gray">Green & Gray</option>
+                    <option value="purple_&_beige">Purple & Beige</option>
+                    <option value="red_&_white">Red & White</option>
+                </select>
+
+                <label for="accent-color">Custom Accent Color:</label>
+                <input type="color" id="accent-color" name="custom_accent_color">
+
+                <label for="layout">Layout:</label>
+                <select id="layout" name="layout">
+                    <option value="one_page">One Page</option>
+                    <option value="multi_page">Multi Page</option>
+                </select>
+
+                <label for="font">Font:</label>
+                <select id="font" name="font">
+                    <option value="sans-serif">Sans-serif</option>
+                    <option value="serif">Serif</option>
+                    <option value="monospace">Monospace</option>
+                </select>
+
+                <input type="checkbox" id="animation" name="animation">
+                <label for="animation">Enable subtle animations</label>
+            </form>
+            <button id="generate-btn">Generate Website</button>
+        </div>
+        <div id="preview" class="step hidden">
+            <h2>Website Preview</h2>
+            <iframe id="preview-frame"></iframe>
+        </div>
+        <div id="publish" class="step hidden">
+            <h2>Publish Your Website</h2>
+            <button id="download-btn">Download Website</button>
+            <button id="publish-btn">Publish to Web</button>
+        </div>
+        <div id="navigation">
+            <button id="back-btn" class="nav-btn">Back</button>
+            <button id="next-btn" class="nav-btn">Next</button>
+        </div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>
