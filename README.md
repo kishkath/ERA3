@@ -3,7 +3,7 @@
 ERA (Extensive Re-Imagined AI)
 
   
-<img src="https://github.com/user-attachments/assets/7b1f3b09-d9b7-43f8-88e5-aec59eaa44cf" width = 720 height = 480>
+<img src="https://github.com/user-attachments/assets/7b1f3b09-d9b7-43f8-88e5-aec59eaa44cf" width = 600 height = 480>
 
 ## Extensive Re-Imagined AI. (VISION + TEXT + AUDIO)
    -------------------------------------------------
