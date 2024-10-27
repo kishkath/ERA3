@@ -13,7 +13,7 @@ AI Intro:
 --------
 
   <p float="left">
-  <img src="https://github.com/user-attachments/assets/04fb7924-4693-4568-9de0-7a658bff5721" width = 540 height = 360>
+  <img src="https://github.com/user-attachments/assets/04fb7924-4693-4568-9de0-7a658bff5721" width = 340 height = 300>
 </p>
 
 
@@ -65,6 +65,7 @@ AI Intro:
       * Click (Ctrl + I), such that a message pop-up box arises to write the prompt for creating any thing.
       * The code and files get created with the result, if the requirement is satifised after cross checking, apply the changes made and save it.
       * Upload the extension to chrome and make the usage.
+        
               * extension creation:
                 -------------------
                   A. Load the Extension into Chrome
