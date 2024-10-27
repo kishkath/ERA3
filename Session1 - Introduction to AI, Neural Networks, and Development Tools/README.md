@@ -4,15 +4,19 @@
   ----------------------
 
   • Fundamentals of AI and Neural Networks: Introduction to core AI concepts, types of neural networks, and their applications.
+  
   • Course Structure and Expectations: Overview of the course syllabus, objectives, and assessment methods.
+  
   • Development Environment Setup: Installing Python, PyTorch, and essential libraries.
+  
   • Introduction to Modern Coding AI Tools: Overview of tools like Cursor to enhance coding efficiency.
+  
   • Introduction to Frontend and Backend Concepts: Brief discussion to prepare for integrating AI models into applications.
   
 AI Intro:
 --------
 
-  <p float="left">
+  <p float="center">
   <img src="https://github.com/user-attachments/assets/04fb7924-4693-4568-9de0-7a658bff5721" width = 340 height = 300>
 </p>
 
