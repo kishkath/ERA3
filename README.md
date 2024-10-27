@@ -9,10 +9,10 @@ ERA (Extensive Re-Imagined AI)
    -------------------------------------------------
 
     * Covering neural networks, transformers, LLMs, and GenAI models. Practical skills are emphasized through continuous integration of MLOps practices, frontend and backend development, and deployment strategies.
-    * A key differentiator of this course is the heavy use of modern coding tools.
     
-like Cursor and Claude dev, which significantly enhance coding efficiency,
-debugging, and experimentation
+    * A key differentiator of this course is the heavy use of modern coding tools like Cursor and Claude dev, which significantly enhance coding efficiency, debugging, and experimentation.
+
+    
 ### 🕗 October2025 - July 2025
 
 **Session1**: Introduction to AI, Neural Networks, and Development Tools
