@@ -1,0 +1,47 @@
+.hidden {
+    display: none;
+}
+
+h1 {
+    font-size: 3rem;
+    text-align: center;
+}
+
+h3 {
+    color: darkblue;
+}
+body{
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    background-color: bisque;
+    margin: 10px;
+    padding: 12px;
+}
+input[type="file"]{
+    padding: 5px;
+    font-size: 1rem;
+}
+
+#file-content {
+    color: black;
+    font-size: 16px;
+    display: block;
+}
+
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: lightcoral;
+    color: black;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 10px;
+}
