@@ -1,4 +1,4 @@
-DUE: Rearrange the below with session3 details.
+## DUE: Rearrange the below with session3 details.
 
 **Session2**::: Python Essentials, Version Control, and Web Development Basics
 
