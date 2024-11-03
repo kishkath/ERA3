@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width initial-scale=1.0"/>
+        <title>AugmentLab</title>
+        <link rel="stylesheet" href="static/styles.css">
+    </head>
+    <body>
+        <h1>Multimedia Data Lab</h1>
+        <div class="form-container">
+            <h3>Upload the data file</h3>
+            <form id="upload-form" enctype="multipart/form-data">
+                <input type="file" id="input-file" accept="text/plain" />
+                <button type="submit" id="submit">Submit</button>
+            </form>
+        </div>
+        <h3><span id="media-content-header" class="hidden">Media content</span></h3>
+        <div id="file-content" class="content-box"></div>
+
+        <h3><span id="preprocessed-content-header" class="hidden">Preprocessed content</span></h3>
+        <div id="tokenized-content" class="content-box"></div>
+
+        <script src="static/script.js"></script>
+    </body>
+</html>
