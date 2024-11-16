@@ -1,0 +1,16 @@
+mnist_model_comparison/
+├── static/
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       └── main.js
+├── templates/
+│   └── index.html
+├── models/
+│   └── model.py
+├── utils/
+│   ├── __init__.py
+│   ├── data_loader.py
+│   └── training.py
+├── app.py
+└── requirements.txt 
