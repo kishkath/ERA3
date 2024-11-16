@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MNIST Model Comparison</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>MNIST Model Channel Configuration Comparison</h1>
+        
+        <div class="model-comparison">
+            <!-- Model 1 Configuration -->
+            <div class="model-config" id="model1-config">
+                <h2>Model 1 Configuration</h2>
+                <div class="config-select-wrapper">
+                    <label>Starting Channels:</label>
+                    <select id="channels1" class="config-select">
+                        <option value="16">16 channels</option>
+                        <option value="32">32 channels</option>
+                    </select>
+                </div>
+                <div class="config-select-wrapper">
+                    <label>Epochs:</label>
+                    <select id="epochs1" class="config-select">
+                        <option value="4">4 epochs</option>
+                        <option value="6">6 epochs</option>
+                        <option value="8">8 epochs</option>
+                        <option value="12">12 epochs</option>
+                        <option value="15">15 epochs</option>
+                    </select>
+                </div>
+                <div class="config-select-wrapper">
+                    <label>Optimizer:</label>
+                    <select id="optimizer1" class="config-select">
+                        <option value="adam">Adam</option>
+                        <option value="sgd">SGD</option>
+                    </select>
+                </div>
+                <div class="config-select-wrapper">
+                    <label>Batch Size:</label>
+                    <select id="batch-size1" class="config-select">
+                        <option value="16">16</option>
+                        <option value="32">32</option>
+                        <option value="64">64</option>
+                        <option value="128">128</option>
+                    </select>
+                </div>
+                <div class="config-select-wrapper">
+                    <label>Number of Predictions:</label>
+                    <select id="predictions1" class="config-select">
+                        <option value="4">4 images</option>
+                        <option value="6">6 images</option>
+                        <option value="8">8 images</option>
+                    </select>
+                </div>
+                <button id="predict-model1" class="control-btn" disabled>Get Predictions</button>
+                <div id="predictions-display1" class="predictions-display"></div>
+                <div class="channel-progression">
+                    <p>Channel Progression:</p>
+                    <div id="progression1">16 → 32 → 64</div>
+                </div>
+                <button id="train-model1" class="control-btn">Train Model 1</button>
+            </div>
+
+            <!-- Model 2 Configuration -->
+            <div class="model-config" id="model2-config">
+                <h2>Model 2 Configuration</h2>
+                <div class="config-select-wrapper">
+                    <label>Starting Channels:</label>
+                    <select id="channels2" class="config-select">
+                        <option value="16">16 channels</option>
+                        <option value="32">32 channels</option>
+                    </select>
+                </div>
+                <div class="config-select-wrapper">
+                    <label>Epochs:</label>
+                    <select id="epochs2" class="config-select">
+                        <option value="4">4 epochs</option>
+                        <option value="6">6 epochs</option>
+                        <option value="8">8 epochs</option>
+                        <option value="12">12 epochs</option>
+                        <option value="15">15 epochs</option>
+                    </select>
+                </div>
+                <div class="config-select-wrapper">
+                    <label>Optimizer:</label>
+                    <select id="optimizer2" class="config-select">
+                        <option value="adam">Adam</option>
+                        <option value="sgd">SGD</option>
+                    </select>
+                </div>
+                <div class="config-select-wrapper">
+                    <label>Batch Size:</label>
+                    <select id="batch-size2" class="config-select">
+                        <option value="16">16</option>
+                        <option value="32">32</option>
+                        <option value="64">64</option>
+                        <option value="128">128</option>
+                    </select>
+                </div>
+                <div class="config-select-wrapper">
+                    <label>Number of Predictions:</label>
+                    <select id="predictions2" class="config-select">
+                        <option value="4">4 images</option>
+                        <option value="6">6 images</option>
+                        <option value="8">8 images</option>
+                    </select>
+                </div>
+                <button id="predict-model2" class="control-btn" disabled>Get Predictions</button>
+                <div id="predictions-display2" class="predictions-display"></div>
+                <div class="channel-progression">
+                    <p>Channel Progression:</p>
+                    <div id="progression2">16 → 32 → 64</div>
+                </div>
+                <button id="train-model2" class="control-btn">Train Model 2</button>
+            </div>
+        </div>
+        
+        <div class="charts-container">
+            <div class="chart-wrapper">
+                <h3>Training Accuracy Comparison</h3>
+                <canvas id="accuracy-chart"></canvas>
+            </div>
+            <div class="chart-wrapper">
+                <h3>Training Loss Comparison</h3>
+                <canvas id="loss-chart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html> 
