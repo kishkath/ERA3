@@ -3,7 +3,7 @@ name: Model Test
 on:
   push:
     branches:
-      - main  # Adjust as needed
+      - main  # Adjust as needed,
   pull_request:
 
 jobs:
