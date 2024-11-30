@@ -1,6 +1,6 @@
 name: Model Test
 
-on: 
+on:
   push:
     branches:
       - main  # Adjust as needed
@@ -33,6 +33,7 @@ jobs:
     - name: Upload Coverage Report
       uses: codecov/codecov-action@v3
       with:
+        token: ${{ secrets.CODECOV_TOKEN }}
         file: ./Session5/coverage.xml
         flags: unittests
         name: codecov-umbrella
