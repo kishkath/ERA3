@@ -1,0 +1,26 @@
+name: Model Test
+
+on:
+  push:
+    branches:
+      - main  # Adjust as needed
+  workflow_dispatch:
+
+jobs:
+  trigger-session5:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Model Test
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const workflow_id = ".github/workflows/model_test.yml";
+
+            await github.actions.createWorkflowDispatch({
+              owner,
+              repo,
+              workflow_id,
+              ref: context.ref.replace('refs/heads/', ''),
+            });
