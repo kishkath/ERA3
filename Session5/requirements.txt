@@ -7,3 +7,4 @@ torchsummary>=1.5.1
 matplotlib>=3.4.0
 pytest>=7.0.0
 pytest-cov>=3.0.0 
+matplotlib
