@@ -3,7 +3,7 @@ name: Model Test
 on:
   push:
     branches:
-      - main  # Adjust as needed,
+      - main  # Adjust as needed
   pull_request:
 
 jobs:
@@ -29,4 +29,3 @@ jobs:
       working-directory: Session5
       run: |
         python -m pytest test_model.py -v --cov=./ --cov-report=xml
-
