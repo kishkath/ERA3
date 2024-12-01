@@ -22,7 +22,7 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install torch torchvision tqdm pillow numpy torchsummary
+        pip install torch torchvision tqdm pillow numpy torchsummary matplotlib
         pip install pytest pytest-cov
 
     - name: Run Model Tests
