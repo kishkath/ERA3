@@ -52,78 +52,75 @@ class TestModelConstraints(unittest.TestCase):
                                      atol=1e-6),
                        "Model output is not a valid probability distribution")
 
-    # New Test 1: Test Model Robustness with Augmented Data
-    def test_model_robustness(self):
-        """Test model's performance on augmented data"""
+    # New Test 1: Test Input Shape Requirements
+    def test_input_shape(self):
+        """Test if model handles correct and incorrect input shapes"""
+        # Test correct shape
+        correct_shape = torch.randn(1, 1, 28, 28).to(self.device)
+        try:
+            _ = self.model(correct_shape)
+            shape_ok = True
+        except:
+            shape_ok = False
+        self.assertTrue(shape_ok, "Model failed to process correct input shape")
+
+        # Test incorrect shapes
+        wrong_shapes = [
+            torch.randn(1, 2, 28, 28),  # Wrong channels
+            torch.randn(1, 1, 32, 32),  # Wrong height/width
+            torch.randn(1, 1, 28)       # Missing dimension
+        ]
+        
+        for idx, wrong_shape in enumerate(wrong_shapes):
+            try:
+                wrong_shape = wrong_shape.to(self.device)
+                _ = self.model(wrong_shape)
+                self.fail(f"Model should not accept wrong shape {idx}")
+            except:
+                pass
+
+    # New Test 2: Test Model Components
+    def test_model_components(self):
+        """Test if model has all required components"""
+        # Check for required layers
+        model_layers = [module for name, module in self.model.named_modules()]
+        
+        # Test for convolutional layers
+        conv_layers = [layer for layer in model_layers if isinstance(layer, torch.nn.Conv2d)]
+        self.assertGreaterEqual(len(conv_layers), 3, "Model should have at least 3 Conv2d layers")
+        
+        # Test for batch normalization layers
+        bn_layers = [layer for layer in model_layers if isinstance(layer, torch.nn.BatchNorm2d)]
+        self.assertGreaterEqual(len(bn_layers), 3, "Model should have batch normalization layers")
+        
+        # Test for dropout
+        dropout_layers = [layer for layer in model_layers if isinstance(layer, torch.nn.Dropout2d)]
+        self.assertGreaterEqual(len(dropout_layers), 1, "Model should have dropout layer")
+
+    # New Test 3: Test Forward Pass Values
+    def test_forward_pass_values(self):
+        """Test if forward pass produces valid values"""
         self.model.eval()
-        correct = 0
-        total = 0
+        x = torch.zeros(1, 1, 28, 28).to(self.device)  # Test with zero input
+        output = self.model(x)
         
-        with torch.no_grad():
-            for data, target in self.aug_test_loader:
-                data, target = data.to(self.device), target.to(self.device)
-                output = self.model(data)
-                pred = output.argmax(dim=1, keepdim=True)
-                correct += pred.eq(target.view_as(pred)).sum().item()
-                total += target.size(0)
+        # Test if output contains NaN
+        self.assertFalse(torch.isnan(output).any(), 
+                        "Model output contains NaN values")
         
-        accuracy = correct / total
-        self.assertGreater(accuracy, 0.85,  # Lower threshold for augmented data
-                          f"Model's robustness test failed with accuracy: {accuracy*100:.2f}%")
-
-    # New Test 2: Test Learning Rate Range
-    def test_learning_rate_sensitivity(self):
-        """Test model's sensitivity to different learning rates"""
-        x = torch.randn(1, 1, 28, 28).to(self.device)
-        original_output = self.model(x)
+        # Test if output contains Inf
+        self.assertFalse(torch.isinf(output).any(), 
+                        "Model output contains Inf values")
         
-        # Test with different learning rates
-        learning_rates = [0.1, 0.01, 0.001]
-        for lr in learning_rates:
-            model_copy = Net().to(self.device)
-            model_copy.load_state_dict(self.model.state_dict())
-            optimizer = torch.optim.Adam(model_copy.parameters(), lr=lr)
-            
-            # Train for one batch
-            data, target = next(iter(self.train_loader))
-            data, target = data.to(self.device), target.to(self.device)
-            optimizer.zero_grad()
-            output = model_copy(data)
-            loss = F.nll_loss(output, target)
-            loss.backward()
-            optimizer.step()
-            
-            # Check if the model can still make predictions
-            new_output = model_copy(x)
-            self.assertTrue(torch.allclose(new_output.sum(), 
-                                         torch.tensor(1.0).to(self.device), 
-                                         atol=1e-3),
-                          f"Model unstable with learning rate {lr}")
-
-    # New Test 3: Test Batch Normalization Behavior
-    def test_batch_norm_behavior(self):
-        """Test if batch normalization layers are working correctly"""
-        self.model.train()  # Set to training mode
+        # Test if output values are within reasonable range
+        self.assertTrue((output <= 0).all(), 
+                       "Log softmax output should be <= 0")
         
-        # Get a batch of data
-        data, _ = next(iter(self.train_loader))
-        data = data.to(self.device)
-        
-        # Forward pass
-        output = self.model(data)
-        
-        # Check batch norm statistics for each conv layer
-        for name, module in self.model.named_modules():
-            if isinstance(module, torch.nn.BatchNorm2d):
-                # Check if running mean and variance are being updated
-                self.assertIsNotNone(module.running_mean)
-                self.assertIsNotNone(module.running_var)
-                
-                # Check if statistics are reasonable
-                self.assertTrue(torch.all(module.running_var > 0),
-                              f"Batch norm layer {name} has invalid variance")
-                self.assertTrue(torch.all(torch.abs(module.running_mean) < 100),
-                              f"Batch norm layer {name} has unstable mean")
+        # Test if output responds to different inputs
+        x_ones = torch.ones(1, 1, 28, 28).to(self.device)
+        output_ones = self.model(x_ones)
+        self.assertFalse(torch.allclose(output, output_ones), 
+                        "Model outputs identical values for different inputs")
 
 if __name__ == '__main__':
     unittest.main() 

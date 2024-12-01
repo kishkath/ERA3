@@ -2,6 +2,8 @@ import torch
 from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 import numpy as np
+import matplotlib.pyplot as plt
+import os
 
 class CustomMNIST(datasets.MNIST):
     """Custom MNIST dataset with cutout augmentation"""
@@ -12,7 +14,37 @@ class CustomMNIST(datasets.MNIST):
         img, target = super().__getitem__(index)
         return img, target
 
-def get_augmented_data_loaders(batch_size=128):
+def save_augmented_samples(dataset, num_samples=4, save_dir='augmented_samples'):
+    """Save grid of augmented samples"""
+    # Create directory if it doesn't exist
+    os.makedirs(save_dir, exist_ok=True)
+    
+    # Create a figure with subplots
+    fig, axes = plt.subplots(2, 2, figsize=(10, 10))
+    axes = axes.ravel()
+    
+    # Get random samples and plot them
+    for i in range(num_samples):
+        # Get a random index
+        idx = torch.randint(0, len(dataset), (1,)).item()
+        img, label = dataset[idx]
+        
+        # Convert tensor to numpy for plotting
+        img_np = img.squeeze().numpy()
+        
+        # Plot the image
+        axes[i].imshow(img_np, cmap='gray')
+        axes[i].axis('off')
+        axes[i].set_title(f'Label: {label}')
+    
+    plt.suptitle('Augmented Sample Images', fontsize=16)
+    plt.tight_layout()
+    
+    # Save the figure
+    plt.savefig(os.path.join(save_dir, 'augmented_samples.png'))
+    plt.close()
+
+def get_augmented_data_loaders(batch_size=128, save_samples=True):
     """Prepare and return train and test data loaders with augmentations"""
     
     # Training augmentations
@@ -47,6 +79,10 @@ def get_augmented_data_loaders(batch_size=128):
         download=True,
         transform=train_transforms
     )
+
+    # Save augmented samples if requested
+    if save_samples:
+        save_augmented_samples(train_dataset)
 
     # Download and load the test data
     test_dataset = CustomMNIST(

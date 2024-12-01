@@ -3,11 +3,11 @@ import torch
 import torch.optim as optim
 from torchvision import datasets
 from PIL import Image
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 # Import all project modules
 from model import Net, get_summary
-from dataset import get_data_loaders
+from dataset_augmented import get_augmented_data_loaders
 from train import train, test
 from inference import predict_single_image, batch_inference
 
@@ -20,21 +20,23 @@ def setup_environment():
     # Create directories if they don't exist
     os.makedirs('data', exist_ok=True)
     os.makedirs('results', exist_ok=True)
+    os.makedirs('augmented_samples', exist_ok=True)
     
     return device
 
 def download_and_prepare_data():
-    """Download MNIST dataset and prepare data loaders"""
-    print("\n1. Downloading and preparing MNIST dataset...")
-    train_loader, test_loader = get_data_loaders(batch_size=128)
+    """Download MNIST dataset and prepare data loaders with augmentation"""
+    print("\n1. Downloading and preparing MNIST dataset with augmentations...")
+    train_loader, test_loader = get_augmented_data_loaders(batch_size=256, save_samples=True)
     print("✓ Data preparation completed")
+    print("✓ Augmented samples saved in 'augmented_samples' directory")
     
     # Save a few examples for later inference
     examples = next(iter(test_loader))
     example_data, _ = examples
-    # for i in range(5):
-    #     img = example_data[i].squeeze().numpy()
-    #     plt.imsave(f'results/example_{i}.png', img, cmap='gray')
+    for i in range(5):
+        img = example_data[i].squeeze().numpy()
+        plt.imsave(f'results/example_{i}.png', img, cmap='gray')
     
     return train_loader, test_loader
 
@@ -61,7 +63,7 @@ def train_model(model, device, train_loader, test_loader):
     
     # Train for two epochs
     final_accuracy = 0
-    for epoch in range(1, 3):
+    for epoch in range(1, 3):  # 2 epochs
         print(f"\nEpoch {epoch}:")
         train_accuracy = train(model, device, train_loader, optimizer, epoch)
         final_accuracy = train_accuracy  # Store the last epoch's accuracy
@@ -102,18 +104,23 @@ def save_results(model, train_accuracy, test_accuracy):
     with open('results/results.txt', 'w') as f:
         f.write(f"Training Accuracy: {train_accuracy*100:.2f}%\n")
         f.write(f"Test Accuracy: {test_accuracy*100:.2f}%\n")
+        
+    # Copy augmented samples to results directory for completeness
+    if os.path.exists('augmented_samples/augmented_samples.png'):
+        import shutil
+        shutil.copy2('augmented_samples/augmented_samples.png', 'results/augmented_samples.png')
     
     print("✓ Results saved to 'results' directory")
 
 def main():
     """Main function to run all processes"""
-    print("Starting complete MNIST CNN workflow...")
+    print("Starting complete MNIST CNN workflow with data augmentation...")
     
     # Setup
     device = setup_environment()
     
     try:
-        # Data preparation
+        # Data preparation with augmentation
         train_loader, test_loader = download_and_prepare_data()
         
         # Model initialization
@@ -129,6 +136,8 @@ def main():
         save_results(model, train_accuracy, test_accuracy)
         
         print("\n✅ All processes completed successfully!")
+        print("   Check 'augmented_samples' directory for augmentation examples")
+        print("   Check 'results' directory for model outputs and performance metrics")
         
     except Exception as e:
         print(f"\n❌ Error occurred: {str(e)}")
