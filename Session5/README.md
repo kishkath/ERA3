@@ -1,6 +1,6 @@
 # MNIST CNN Model with Parameter and Accuracy Constraints
 
-![Model Test](https://github.com/kishkath/ERA3/actions/workflows/model_test.yml/badge.svg)
+![Model Test](https://github.com/kishkath/ERA3/Session5/actions/workflows/model_test.yml/badge.svg)
 
 This project implements a Convolutional Neural Network (CNN) for the MNIST dataset with specific constraints:
 - Less than 25,000 parameters
