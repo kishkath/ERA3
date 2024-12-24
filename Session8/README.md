@@ -55,19 +55,43 @@ use albumentation library and apply:
  * For every convolution block, there has to be 3 3x3 kernel convolutions with a stride of 2.
  * Total Parameter Count: 196,330
    
-   ------------------------------------------------------------------------------------------------------------------------------
- * | Block            | Layer                              | Kernel Size | Stride | Padding | Dilation | N-out | RF-out | J-out |
-   |------------------|------------------------------------|-------------|--------|---------|----------|-------|--------|-------|
-   | **Conv Block 1** | Conv2D (3 → 32)                    | 3           | 1      | 1       | 1        | 32    | 3      | 1     |
-   |                  | Conv2D (32 → 64, dilated)          | 3           | 1      | 1       | 2        | 32    | 7      | 1     |
-   | **Conv Block 2** | Conv2D (64 → 64)                   | 3           | 1      | 1       | 1        | 32    | 9      | 1     |
-   |                  | Conv2D (64 → 128, stride 2)        | 3           | 2      | 1       | 1        | 16    | 13     | 2     |
-   | **Conv Block 3** | Depthwise Conv2D (128 → 128)       | 3           | 1      | 0       | 1        | 14    | 17     | 2     |
-   |                  | Pointwise Conv2D (128 → 64)        | 1           | 1      | 0       | 1        | 14    | 17     | 2     |
-   |                  | Conv2D (64 → 64, stride 2)         | 3           | 2      | 0       | 1        | 6     | 25     | 4     |
-   | **Conv Block 4** | Conv2D (64 → 32)                   | 3           | 1      | 0       | 1        | 4     | 33     | 4     |
-   | **Global Pool**  | AdaptiveAvgPool2d (1 × 1)          | -           | -      | -       | -        | 1     | 49     | 4     |
-   ------------------------------------------------------------------------------------------------------------------------------
+ * Calculation formulae:
+   --------------------
+    ## Formulas for Calculations
+  
+    ### 1. Output Feature Map Size (\( N_\text{out} \)):
+    \[
+    N_\text{out} = \left\lfloor \frac{N_\text{in} + 2 \cdot \text{Padding} - \text{Kernel Size}}{\text{Stride}} + 1 \right\rfloor
+    \]
+    
+    ### 2. Receptive Field (\( RF_\text{out} \)):
+    \[
+    RF_\text{out} = RF_\text{in} + (\text{Kernel Size} - 1) \cdot J_\text{in}
+    \]
+    
+    ### 3. Output Jump (\( J_\text{out} \)):
+    \[
+    J_\text{out} = J_\text{in} \cdot \text{Stride}
+    \]
+    
+    ### 4. Effective Kernel Size for Dilated Convolutions:
+    \[
+    \text{Effective Kernel Size} = \text{Kernel Size} + (\text{Kernel Size} - 1) \cdot (\text{Dilation} - 1)
+    \]
+ 
+     ------------------------------------------------------------------------------------------------------------------------------
+   * | Block            | Layer                              | Kernel Size | Stride | Padding | Dilation | N-out | RF-out | J-out |
+     |------------------|------------------------------------|-------------|--------|---------|----------|-------|--------|-------|
+     | **Conv Block 1** | Conv2D (3 → 32)                    | 3           | 1      | 1       | 1        | 32    | 3      | 1     |
+     |                  | Conv2D (32 → 64, dilated)          | 3           | 1      | 1       | 2        | 32    | 7      | 1     |
+     | **Conv Block 2** | Conv2D (64 → 64)                   | 3           | 1      | 1       | 1        | 32    | 9      | 1     |
+     |                  | Conv2D (64 → 128, stride 2)        | 3           | 2      | 1       | 1        | 16    | 13     | 2     |
+     | **Conv Block 3** | Depthwise Conv2D (128 → 128)       | 3           | 1      | 0       | 1        | 14    | 17     | 2     |
+     |                  | Pointwise Conv2D (128 → 64)        | 1           | 1      | 0       | 1        | 14    | 17     | 2     |
+     |                  | Conv2D (64 → 64, stride 2)         | 3           | 2      | 0       | 1        | 6     | 25     | 4     |
+     | **Conv Block 4** | Conv2D (64 → 32)                   | 3           | 1      | 0       | 1        | 4     | 33     | 4     |
+     | **Global Pool**  | AdaptiveAvgPool2d (1 × 1)          | -           | -      | -       | -        | 1     | 49     | 4     |
+     ------------------------------------------------------------------------------------------------------------------------------
 
 🔋 Augmented Images: 
 -------------------
