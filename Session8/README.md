@@ -1,15 +1,14 @@
-**Session9: Advanced Convolutions & Augmentations**: The session describes about the various types of convolutions specifying their advantages & disadvantages. It also introduces a technique to reduce over-fitting issue known as Augmentating data using PyTorch library 
+**Session8: Advanced Convolutions & Augmentations**: The session describes about the various types of convolutions specifying their advantages & disadvantages. It also introduces a technique to reduce over-fitting issue known as Augmentating data using PyTorch library 
 Albumentations. 
 
  Do More: https://albumentations.ai/
  
 
-### Session 9 Assignment: 
+### Session 8 Assignment: 
 
 🔏 Problem Statement: 
 --------------------
-Write a new network thathas the architecture to C1C2C3C40 (No MaxPooling, but 3 convolutions, 
-where the last one has a stride of 2 instead) total RF must be more than 44
+Write a new network that has the architecture to C1C2C3C40 (No MaxPooling, but convolutions, where the last one has a stride of 2 instead) (NO restriction on using 1x1) (If you can figure out how to use Dilated kernels here instead of MP or strided convolution, then 200pts extra!)
 
 one of the layers must use Depthwise Separable Convolution
  
