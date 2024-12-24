@@ -58,29 +58,22 @@ use albumentation library and apply:
  * Calculation formulae:
    --------------------
     ## Formulas for Calculations
-  
-    ### 1. Output Feature Map Size (\( N_\text{out} \)):
-    \[
-    N_\text{out} = \left\lfloor \frac{N_\text{in} + 2 \cdot \text{Padding} - \text{Kernel Size}}{\text{Stride}} + 1 \right\rfloor
-    \]
-    
-    ### 2. Receptive Field (\( RF_\text{out} \)):
-    \[
-    RF_\text{out} = RF_\text{in} + (\text{Kernel Size} - 1) \cdot J_\text{in}
-    \]
-    
-    ### 3. Output Jump (\( J_\text{out} \)):
-    \[
-    J_\text{out} = J_\text{in} \cdot \text{Stride}
-    \]
-    
-    ### 4. Effective Kernel Size for Dilated Convolutions:
-    \[
-    \text{Effective Kernel Size} = \text{Kernel Size} + (\text{Kernel Size} - 1) \cdot (\text{Dilation} - 1)
-    \]
+
+     ### 1. Output Feature Map Size (N_out):
+     N_out = floor((N_in + 2 * Padding - Kernel Size) / Stride) + 1
+     
+     ### 2. Receptive Field (RF_out):
+     RF_out = RF_in + (Kernel Size - 1) * J_in
+     
+     ### 3. Output Jump (J_out):
+     J_out = J_in * Stride
+     
+     ### 4. Effective Kernel Size for Dilated Convolutions:
+     Effective Kernel Size = Kernel Size + (Kernel Size - 1) * (Dilation - 1)
+
  
      ------------------------------------------------------------------------------------------------------------------------------
-   * | Block            | Layer                              | Kernel Size | Stride | Padding | Dilation | N-out | RF-out | J-out |
+     | Block            | Layer                              | Kernel Size | Stride | Padding | Dilation | N-out | RF-out | J-out |
      |------------------|------------------------------------|-------------|--------|---------|----------|-------|--------|-------|
      | **Conv Block 1** | Conv2D (3 → 32)                    | 3           | 1      | 1       | 1        | 32    | 3      | 1     |
      |                  | Conv2D (32 → 64, dilated)          | 3           | 1      | 1       | 2        | 32    | 7      | 1     |
