@@ -39,13 +39,13 @@ use albumentation library and apply:
     ---------
     ├── Advanced Convolutions & Augmentations
     │   ├── models
-    │   │   ├── S9_model.py: The Network Architecture designed to achieve 85% accuracy.
+    │   │   ├── model.py: The Network Architecture designed to achieve 85% accuracy.
     │   ├── utility
     │   │   ├── dataset.py: Managing the data & retrieving it.
     │   │   ├── run.py:     Makes the model learn.
     │   │   ├── utils.py:   Contains the utilities required for the process.
     │   │   ├── visualize.py: Contains the code for visualizing.
-    │   ├── CIFAR10_V0.ipynb:  Execution of Network.
+    │   ├── cifar-10c.ipynb:  Execution of Network.
     └── README.md Details about the Process.
 
 
@@ -53,7 +53,21 @@ use albumentation library and apply:
 ---------------------
  "C1-C2-C3-C4-output"
  * For every convolution block, there has to be 3 3x3 kernel convolutions with a stride of 2.
- * Total Parameter Count: 180,978
+ * Total Parameter Count: 196,330
+   
+   ------------------------------------------------------------------------------------------------------------------------------
+ * | Block            | Layer                              | Kernel Size | Stride | Padding | Dilation | N-out | RF-out | J-out |
+   |------------------|------------------------------------|-------------|--------|---------|----------|-------|--------|-------|
+   | **Conv Block 1** | Conv2D (3 → 32)                    | 3           | 1      | 1       | 1        | 32    | 3      | 1     |
+   |                  | Conv2D (32 → 64, dilated)          | 3           | 1      | 1       | 2        | 32    | 7      | 1     |
+   | **Conv Block 2** | Conv2D (64 → 64)                   | 3           | 1      | 1       | 1        | 32    | 9      | 1     |
+   |                  | Conv2D (64 → 128, stride 2)        | 3           | 2      | 1       | 1        | 16    | 13     | 2     |
+   | **Conv Block 3** | Depthwise Conv2D (128 → 128)       | 3           | 1      | 0       | 1        | 14    | 17     | 2     |
+   |                  | Pointwise Conv2D (128 → 64)        | 1           | 1      | 0       | 1        | 14    | 17     | 2     |
+   |                  | Conv2D (64 → 64, stride 2)         | 3           | 2      | 0       | 1        | 6     | 25     | 4     |
+   | **Conv Block 4** | Conv2D (64 → 32)                   | 3           | 1      | 0       | 1        | 4     | 33     | 4     |
+   | **Global Pool**  | AdaptiveAvgPool2d (1 × 1)          | -           | -      | -       | -        | 1     | 49     | 4     |
+   ------------------------------------------------------------------------------------------------------------------------------
 
 🔋 Augmented Images: 
 -------------------
@@ -61,17 +75,28 @@ use albumentation library and apply:
 
 💊 Network Results: 
 -------------------
- Trained the network for 72 Epochs with SGD optimizer and CrossEntropyLoss fn.
- 
- Achieved the desired accuracy at 45th Epoch.
- 
-     Epoch 45
-     Train: Loss=0.5043 Batch_id=390 Accuracy=77.08: 100%|██████████| 391/391 [00:17<00:00, 22.08it/s]
-     Test set: Average loss: 0.0035, Accuracy: 8526/10000 (85.26%)
- 
- <img src="https://github.com/kishkath/ERA/assets/60026221/2e0d4048-3233-4f65-9670-be0db37b4b15" width = 720 height = 360>
+ Trained the network for 60 Epochs with SGD optimizer and CrossEntropyLoss fn.
 
- * Mis-classified Images:
--------------------------
- <img src="https://github.com/kishkath/ERA/assets/60026221/a030e214-6184-4a86-91e1-3b2ddaa951f9" width = 720 height = 360>
+ Neural Network has the receptive field of 49
+ 
+ Achieved the desired accuracy at 47th Epoch.
+ 
+     
+    Epoch 47
+    Train: Loss=0.7390 Batch_id=390 Accuracy=77.51: 100%|██████████| 391/391 [01:43<00:00,  3.77it/s]
+    Test set: Average loss: 0.0034, Accuracy: 8557/10000 (85.57%)
+    
+    Epoch 48
+    Train: Loss=0.5536 Batch_id=390 Accuracy=77.60: 100%|██████████| 391/391 [01:40<00:00,  3.89it/s]
+    Test set: Average loss: 0.0036, Accuracy: 8475/10000 (84.75%)
+    
+    Epoch 49
+    Train: Loss=0.7201 Batch_id=390 Accuracy=77.87: 100%|██████████| 391/391 [01:37<00:00,  4.01it/s]
+    Test set: Average loss: 0.0035, Accuracy: 8493/10000 (84.93%)
+    
+    Epoch 50
+    Train: Loss=0.4808 Batch_id=390 Accuracy=77.90: 100%|██████████| 391/391 [01:56<00:00,  3.36it/s]
+    Test set: Average loss: 0.0034, Accuracy: 8530/10000 (85.30%)
+    
+
 
