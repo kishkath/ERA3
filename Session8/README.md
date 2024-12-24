@@ -52,7 +52,7 @@ use albumentation library and apply:
 🔑 Model Architecture:
 ---------------------
  "C1-C2-C3-C4-output"
- * For every convolution block, there has to be 3 3x3 kernel convolutions with a stride of 2.
+ * For every convolution block, there are convolutions along with a stride of 2.
  * Total Parameter Count: 196,330
    
  * Calculation formulae:
