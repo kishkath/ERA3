@@ -78,7 +78,7 @@ A specialized Byte Pair Encoding (BPE) implementation optimized for Telugu text 
 1. Setup Environment:
    ```bash
    # Clone repository
-   git clone <repository>
+   git clone git@github.com:kishkath/ERA3.git
    cd Session11
    ```
 
@@ -92,8 +92,8 @@ A specialized Byte Pair Encoding (BPE) implementation optimized for Telugu text 
    ```bash
    python train.py
    # Creates:
-   # - models/telugu_bpe.model
-   # - models/telugu_bpe.vocab
+   # - models/telugu_basic.model
+   # - models/telugu-baisc.vocab
    # - vocabulary.json
    ```
 
