@@ -78,11 +78,11 @@ A specialized Byte Pair Encoding (BPE) implementation optimized for Telugu text 
 1. Setup Environment:
    ```bash
    # Clone repository
-   git clone git@github.com:kishkath/ERA3.git
+   git clone https://github.com/kishkath/ERA3.git
    cd Session11
    ```
 
-2. Prepare Data:
+2. Prepare Data(alo automatically gets executed in train.py):
    ```bash
    python dataset.py
    # This creates cleaned_text.txt
@@ -105,6 +105,15 @@ A specialized Byte Pair Encoding (BPE) implementation optimized for Telugu text 
             Text length: 4359080
             Words length: 540756
             Sample words: ['సుశీలమ్మ', 'కళ్ళలో', 'భయం', 'పారాడింది.', 'అనాధ', 'బిడ్డ', 'అని', 'చిన్నప్పుడే', 'తెలిస్తే', 'మన']
+
+            merge 4441/4544: (593, 170) -> 4696 (b'\xe0\xb1\x81\xe0\xb0\xb2\xe0\xb1\x8b \xe0\xb0\xaa') had 57 occurrences
+             merge 4461/4544: (348, 303) -> 4716 (b'\xe0\xb0\xbe\xe0\xb0\xb5\xe0\xb1\x81\xe0\xb0\x95') had 57 occurrences
+             merge 4481/4544: (697, 446) -> 4736 (b' \xe0\xb0\x8e\xe0\xb0\xaa\xe0\xb1\x8d\xe0\xb0\xaa\xe0\xb1\x81\xe0\xb0\xa1') had 56 occurrences
+             merge 4501/4544: (143, 275) -> 4756 (b'\x8f\xe0\xb0\xb0') had 56 occurrences
+             merge 4521/4544: (437, 628) -> 4776 (b'\xe0\xb0\xbf\xe0\xb0\xae\xe0\xb1\x81\xe0\xb0\x96') had 56 occurrences
+             merge 4541/4544: (343, 407) -> 4796 (b'\xe0\xb0\xbf\xe0\xb0\xb2\xe0\xb0\xbe\xe0\xb0\x97') had 55 occurrences
+             
+             Training completed in 1706.09 seconds
 
 5. Run Tests:
    ```bash
