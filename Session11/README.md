@@ -18,10 +18,10 @@ A specialized Byte Pair Encoding (BPE) implementation optimized for Telugu text 
                               Words length: 540756
 
 ## Model Specifications
-- Vocabulary Size: 4800 tokens (< 5000 requirement met)
-- Compression Ratio: 3.45X (> 3.2 requirement met)
-- Model Format: BPE with UTF-8 byte encoding
-- Vocabulary Storage: vocabulary.json
+     - Vocabulary Size: 4800 tokens (< 5000 requirement met)
+     - Compression Ratio: 3.45X (> 3.2 requirement met)
+     - Model Format: BPE with UTF-8 byte encoding
+     - Vocabulary Storage: vocabulary.json
 
 ## Implementation Details
 
