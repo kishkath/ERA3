@@ -12,6 +12,7 @@ A specialized Byte Pair Encoding (BPE) implementation optimized for Telugu text 
   - Retained only Telugu Unicode characters and basic punctuation
   - Normalized whitespace
 - Absolute values:
+  
                               Initial unique characters: 69
                               Text length: 4359080
                               Words length: 540756
