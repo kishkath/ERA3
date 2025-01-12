@@ -3,6 +3,7 @@
 A specialized Byte Pair Encoding (BPE) implementation optimized for Telugu text processing.
 
 ## Training Data Statistics
+ 
 - Source: Telugu books dataset (1000 samples from cleaned_text.txt)
 - Total text length: ~100K characters
 - Unique characters before BPE: ~70 (Telugu Unicode range: \u0C00-\u0C7F)
@@ -10,6 +11,10 @@ A specialized Byte Pair Encoding (BPE) implementation optimized for Telugu text 
   - Removed URLs, citations, digits, English characters
   - Retained only Telugu Unicode characters and basic punctuation
   - Normalized whitespace
+- Absolute values:
+                              Initial unique characters: 69
+                              Text length: 4359080
+                              Words length: 540756
 
 ## Model Specifications
 - Vocabulary Size: 4800 tokens (< 5000 requirement met)
@@ -92,7 +97,16 @@ A specialized Byte Pair Encoding (BPE) implementation optimized for Telugu text 
    # - vocabulary.json
    ```
 
-4. Run Tests:
+   logs:
+
+            Total data lines collected: 998
+            Cleaning and saving completed successfully!
+            Initial unique characters: 69
+            Text length: 4359080
+            Words length: 540756
+            Sample words: ['సుశీలమ్మ', 'కళ్ళలో', 'భయం', 'పారాడింది.', 'అనాధ', 'బిడ్డ', 'అని', 'చిన్నప్పుడే', 'తెలిస్తే', 'మన']
+
+5. Run Tests:
    ```bash
    python test.py
    ```
@@ -101,19 +115,12 @@ A specialized Byte Pair Encoding (BPE) implementation optimized for Telugu text 
 
 1. Simple Encoding/Decoding:
 ```python
-from basic import BasicTokenizer
 
-tokenizer = BasicTokenizer()
-tokenizer.load("models/telugu_bpe.model")
-
-text = "అది ఒక అందమైన రోజు"
-encoded = tokenizer.encode(text)
-decoded = tokenizer.decode(encoded)
-
-print(f"Original: {text}")
-print(f"Encoded: {encoded}")
-print(f"Decoded: {decoded}")
-print(f"Compression: {len(text.encode('utf-8')) / (len(encoded) * 2)}X")
+Test text: చెట్టు పెరగాలంటే విత్తనం నాటాలి
+Encoded: [330, 480, 402, 617, 316, 2411, 181, 2741, 270, 683, 378, 311, 260]
+Decoded: చెట్టు పెరగాలంటే విత్తనం నాటాలి
+Compression ratio: 3.35X
+Final vocabulary size: 4800
 ```
 
 2. Complex Text Example:
