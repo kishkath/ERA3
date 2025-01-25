@@ -50,8 +50,8 @@ The training was conducted in the `gpt2_training.ipynb` notebook with the follow
    - Implemented custom DataLoader for efficient batch processing
 
 2. **Training Configuration**
-   - Batch size: 4
-   - Sequence length: 32
+   - Batch size: 8
+   - Sequence length: 512
    - Learning rate: 3e-4
    - Optimizer: AdamW
    - Training iterations: 9600steps (only 1 Epoch)
