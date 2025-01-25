@@ -1,8 +1,3 @@
-
-hugging face space app : https://huggingface.co/spaces/kishkath/GPT2
-
-![Screenshot from 2025-01-25 09-42-36](https://github.com/user-attachments/assets/f55347f3-2f88-46a9-899a-d12e949cd351)
-
 # Shakespeare GPT Text Generator
 
 A GPT-2 based text generator fine-tuned on Shakespeare's works, deployed as a Hugging Face Space with a Gradio interface.
@@ -11,12 +6,6 @@ A GPT-2 based text generator fine-tuned on Shakespeare's works, deployed as a Hu
 
 To achieve loss less than 0.09999. 
 
-
-    
-                              step9593, loss: 0.009427091106772423
-                              step9594, loss: 0.007421619724482298
-                              step9595, loss: 0.005883163306862116
-                              step9596, loss: 0.01099485345184803
                               step9597, loss: 0.006384422071278095
                               step9598, loss: 0.007867483422160149
                               step9599, loss: 0.006179888732731342
@@ -24,6 +13,11 @@ To achieve loss less than 0.09999.
 ## Project Overview
 
 This project implements a custom GPT model trained on Shakespeare's complete works to generate Shakespeare-style text. The model uses the GPT-2 architecture and is trained from scratch on Shakespeare's texts.
+
+hugging face space app : https://huggingface.co/spaces/kishkath/GPT2
+
+![Screenshot from 2025-01-25 09-42-36](https://github.com/user-attachments/assets/f55347f3-2f88-46a9-899a-d12e949cd351)
+
 
 ## Model Architecture
 
