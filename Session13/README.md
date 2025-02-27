@@ -14,6 +14,7 @@ This project demonstrates the process of training and optimizing the **SmolLM2-1
 4. Reverse engineer model details using the YAML configuration and **Hugging Face** checkpoints.
 5. Upload the trained and quantized model to **Hugging Face Spaces** for inference.
 
+** Check-out the jupyter notebook smollM2.ipynb **
 ---
 
 ## 🧠 SmolLM2-135M Model Definition
