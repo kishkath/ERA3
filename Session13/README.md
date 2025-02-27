@@ -8,13 +8,14 @@
 
 This project demonstrates the process of training and optimizing the **SmolLM2-135M** model, a lightweight causal language model. The primary objective is to:
 
-1. Train the model for **5000 steps** with predictions logged every **500 steps**.
-2. Save a checkpoint at 5000 steps and resume training for **50 additional steps**.
-3. Leverage advanced performance optimizations (e.g., **FlashAttention**, **Dynamic Quantization**, **Weight Sharing**).
-4. Reverse engineer model details using the YAML configuration and **Hugging Face** checkpoints.
-5. Upload the trained and quantized model to **Hugging Face Spaces** for inference.
+Check-out the jupyter notebook smollM2.ipynb having following operations:
 
-** Check-out the jupyter notebook smollM2.ipynb **
+    1. Train the model for **5000 steps** with predictions logged every **500 steps**.
+    2. Save a checkpoint at 5000 steps and resume training for **50 additional steps**.
+    3. Leverage advanced performance optimizations (e.g., **FlashAttention**, **Dynamic Quantization**, **Weight Sharing**).
+    4. Reverse engineer model details using the YAML configuration and **Hugging Face** checkpoints.
+    5. Upload the trained and quantized model to **Hugging Face Spaces** for inference.
+
 ---
 
 ## 🧠 SmolLM2-135M Model Definition
