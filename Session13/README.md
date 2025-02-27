@@ -1,5 +1,8 @@
 # SmolLM2-135M: Training, Checkpointing, and Deployment
 
+**SmolLM2-135M** is a lightweight language model designed for efficiency while maintaining strong text generation capabilities. This document describes the model architecture, training process, optimization techniques, and deployment steps.
+
+
 ## 📚 Project Overview
 
 This project demonstrates the process of training and optimizing the **SmolLM2-135M** model, a lightweight causal language model. The primary objective is to:
