@@ -30,6 +30,31 @@ The **SmolLM2-135M** model is based on a **decoder-only transformer** architectu
 - **Embedding Dimension:** 576
 - **Intermediate Size:** 1536
 
+                    SMOLL(
+                            (transformer): ModuleDict(
+                              (wte): Embedding(49152, 576)
+                              (wpe): Embedding(1024, 576)
+                              (h): ModuleList(
+                                (0-29): 30 x Block(
+                                  (rms_1): RMSNorm()
+                                  (attn): CausalSelfAttention(
+                                    (c_attn): Linear(in_features=576, out_features=1728, bias=True)
+                                    (c_proj): Linear(in_features=576, out_features=576, bias=True)
+                                    (norm): RMSNorm()
+                                  )
+                                  (rms_2): RMSNorm()
+                                  (mlp): MLP(
+                                    (c_fc): Linear(in_features=576, out_features=1536, bias=True)
+                                    (gelu): GELU(approximate='tanh')
+                                    (c_proj): Linear(in_features=1536, out_features=576, bias=True)
+                                    (rms_norm): RMSNorm()
+                                  )
+                                )
+                              )
+                              (ln_f): LayerNorm((576,), eps=1e-05, elementwise_affine=True)
+                            )
+                            (lm_head): Linear(in_features=576, out_features=49152, bias=False)
+                          )
 ### Model Components Breakdown:
 
 1. **Embedding Layers:**
