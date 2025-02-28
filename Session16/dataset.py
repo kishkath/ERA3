@@ -7,42 +7,55 @@ import torchvision.datasets as datasets
 class OxfordPetDataset(Dataset):
     """
     Oxford-IIIT Pet segmentation dataset loader using torchvision.
-    
-    This class downloads the dataset from the web using torchvision's built-in
-    OxfordIIITPet dataset. It loads images and their segmentation masks, converting
-    the masks into a binary format (e.g., treating class "1" as the pet and others as background).
+    Downloads the dataset automatically and converts segmentation masks
+    to binary masks (assuming class "1" represents the pet).
     
     Args:
         root (str): Directory where the dataset will be stored.
-        split (str): Split to use, e.g., "trainval". Defaults to "trainval".
-        transform (callable, optional): Transform to apply to the input images.
-        mask_transform (callable, optional): Transform to apply to the segmentation masks.
+        split (str): Dataset split to use (e.g., "trainval").
+        transform (callable, optional): Transform to apply to input images.
+        mask_transform (callable, optional): Transform to apply to segmentation masks.
     """
     def __init__(self, root, split="trainval", transform=None, mask_transform=None):
-        # Download and load the dataset directly from torchvision.
-        self.dataset = datasets.OxfordIIITPet(root, split=split, target_types="segmentation", download=True)
         self.transform = transform
         self.mask_transform = mask_transform
+        try:
+            print("Downloading/Loading Oxford-IIIT Pet dataset...")
+            self.dataset = datasets.OxfordIIITPet(root, split=split, target_types="segmentation", download=True)
+            print("Dataset successfully loaded!")
+        except Exception as e:
+            print(f"Error loading dataset: {e}")
+            raise e
 
     def __len__(self):
         return len(self.dataset)
 
     def __getitem__(self, idx):
-        image, mask = self.dataset[idx]
+        try:
+            image, mask = self.dataset[idx]
+            print(f"Loaded sample index {idx}.")
+        except Exception as e:
+            print(f"Error loading item at index {idx}: {e}")
+            raise e
         
-        # Apply transforms to the image.
-        if self.transform:
-            image = self.transform(image)
-        
-        # Process the segmentation mask.
-        if self.mask_transform:
-            mask = self.mask_transform(mask)
-        else:
-            # Default processing: resize mask and convert to binary segmentation mask.
-            mask = mask.resize((256, 256), resample=Image.NEAREST)
-            mask = np.array(mask).astype(np.int64)
-            # For binary segmentation, we assume that pixels labeled "1" represent the pet.
-            binary_mask = (mask == 1).astype(np.float32)
-            mask = torch.from_numpy(binary_mask).unsqueeze(0)
-        
+        try:
+            # Apply image transformation if provided.
+            if self.transform:
+                image = self.transform(image)
+            # Process segmentation mask.
+            if self.mask_transform:
+                mask = self.mask_transform(mask)
+            else:
+                mask = mask.resize((256, 256), resample=Image.NEAREST)
+                mask = np.array(mask).astype(np.int64)
+                # For binary segmentation: treat pixels labeled "1" as the pet.
+                binary_mask = (mask == 1).astype(np.float32)
+                mask = torch.from_numpy(binary_mask).unsqueeze(0)
+        except Exception as e:
+            print(f"Error processing sample index {idx}: {e}")
+            raise e
+        finally:
+            # No special finalization is required here.
+            pass
+
         return image, mask
