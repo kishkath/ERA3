@@ -14,7 +14,7 @@ class DoubleConv(nn.Module):
                 nn.BatchNorm2d(out_channels),
                 nn.ReLU(inplace=True)
             )
-            print(f"Initialized DoubleConv: {in_channels} -> {out_channels}")
+            # print(f"Initialized DoubleConv: {in_channels} -> {out_channels}")
         except Exception as e:
             print(f"Error initializing DoubleConv: {e}")
             raise e
@@ -36,7 +36,7 @@ class Down(nn.Module):
                 nn.MaxPool2d(2),
                 DoubleConv(in_channels, out_channels)
             )
-            print(f"Initialized Down: {in_channels} -> {out_channels}")
+            # print(f"Initialized Down: {in_channels} -> {out_channels}")
         except Exception as e:
             print(f"Error initializing Down: {e}")
             raise e
@@ -57,7 +57,7 @@ class Up(nn.Module):
             self.up = nn.ConvTranspose2d(in_channels, out_channels, kernel_size=2, stride=2)
             # After concatenation, channels double (skip connection + upsampled features)
             self.conv = DoubleConv(in_channels, out_channels)
-            print(f"Initialized Up: {in_channels} -> {out_channels}")
+            # print(f"Initialized Up: {in_channels} -> {out_channels}")
         except Exception as e:
             print(f"Error initializing Up: {e}")
             raise e
@@ -84,7 +84,7 @@ class OutConv(nn.Module):
         super(OutConv, self).__init__()
         try:
             self.conv = nn.Conv2d(in_channels, out_channels, kernel_size=1)
-            print(f"Initialized OutConv: {in_channels} -> {out_channels}")
+            # print(f"Initialized OutConv: {in_channels} -> {out_channels}")
         except Exception as e:
             print(f"Error initializing OutConv: {e}")
             raise e
