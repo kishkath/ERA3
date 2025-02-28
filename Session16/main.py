@@ -14,7 +14,7 @@ from PIL import Image
 from dataset import OxfordPetDataset
 from model import UNet
 from losses import get_loss  # Returns either bce_loss or dice_loss based on input
-from trainer import train_model#, run_inference_on_image, visualize_predictions
+from trainer import train_model  # (Optional: if you want to use additional trainer functions)
 
 def main(args):
     try:
@@ -25,9 +25,12 @@ def main(args):
         return
 
     # Define transforms for images and masks.
+    # Here we add normalization after converting to tensor.
     img_transform = transforms.Compose([
         transforms.Resize((256, 256)),
         transforms.ToTensor(),
+        transforms.Normalize(mean=(0.485, 0.456, 0.406),  # Normalization parameters
+                             std=(0.229, 0.224, 0.225))
     ])
     mask_transform = transforms.Compose([
         transforms.Resize((256, 256), interpolation=Image.NEAREST),
@@ -165,7 +168,7 @@ def main(args):
             print(f"[ERROR] Inference failed: {e}")
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="UNet (MaxPool+Transpose) with configurable loss")
+    parser = argparse.ArgumentParser(description="UNet (MaxPool+Transpose) with configurable loss and normalization")
     parser.add_argument('--data_root', type=str, default='./data', help="Path to dataset root (downloaded automatically)")
     parser.add_argument('--epochs', type=int, default=10, help="Number of training epochs")
     parser.add_argument('--batch_size', type=int, default=4, help="Batch size for training")
