@@ -21,7 +21,9 @@ class OxfordPetDataset(Dataset):
         self.mask_transform = mask_transform
         try:
             print("Downloading/Loading Oxford-IIIT Pet dataset...")
-            self.dataset = datasets.OxfordIIITPet(root, split=split, target_types="segmentation", download=True)
+            self.dataset = datasets.OxfordIIITPet(
+                root, split=split, target_types="segmentation", download=True
+            )
             print("Dataset successfully loaded!")
         except Exception as e:
             print(f"Error loading dataset: {e}")
@@ -39,10 +41,10 @@ class OxfordPetDataset(Dataset):
             raise e
         
         try:
-            # Apply image transformation if provided.
+            # Apply transformation to the image.
             if self.transform:
                 image = self.transform(image)
-            # Process segmentation mask.
+            # Process the segmentation mask.
             if self.mask_transform:
                 mask = self.mask_transform(mask)
             else:
@@ -55,7 +57,6 @@ class OxfordPetDataset(Dataset):
             print(f"Error processing sample index {idx}: {e}")
             raise e
         finally:
-            # No special finalization is required here.
             pass
 
         return image, mask
