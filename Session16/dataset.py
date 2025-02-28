@@ -35,7 +35,7 @@ class OxfordPetDataset(Dataset):
     def __getitem__(self, idx):
         try:
             image, mask = self.dataset[idx]
-            print(f"Loaded sample index {idx}.")
+            # print(f"Loaded sample index {idx}.")
         except Exception as e:
             print(f"Error loading item at index {idx}: {e}")
             raise e
