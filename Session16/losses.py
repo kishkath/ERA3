@@ -1,55 +1,71 @@
 import torch
-import torch.nn as nn
+import torch.nn.functional as F
 
-import torch
+def bce_loss(pred, target, reduction='mean'):
+    """
+    Computes the Binary Cross-Entropy (BCE) loss with logits.
+    
+    Args:
+        pred (Tensor): Predicted logits from the model.
+        target (Tensor): Ground truth tensor (same shape as pred) with values 0 or 1.
+        reduction (str): Specifies the reduction to apply ('mean', 'sum', or 'none').
+    
+    Returns:
+        Tensor: The computed BCE loss.
+    """
+    try:
+        loss = F.binary_cross_entropy_with_logits(pred, target, reduction=reduction)
+        # Debug statement: print the computed loss if needed
+        # print(f"BCE loss computed: {loss.item():.4f}")
+    except Exception as e:
+        print(f"[ERROR] Error computing BCE loss: {e}")
+        raise e
+    return loss
 
 def dice_loss(pred, target, smooth=1e-6):
     """
-    Computes Dice Loss with sigmoid activation for binary segmentation.
+    Computes the Dice loss based on the Dice coefficient.
+    Sigmoid activation is applied to the predictions.
+    
     Args:
-        pred (torch.Tensor): Model predictions (logits).
-        target (torch.Tensor): Ground truth (binary mask).
-        smooth (float): Smoothing factor to avoid division by zero.
+        pred (Tensor): Predicted logits from the model.
+        target (Tensor): Ground truth tensor with binary values.
+        smooth (float): A small constant to avoid division by zero.
+    
     Returns:
-        torch.Tensor: Dice loss value.
+        Tensor: The computed Dice loss.
     """
     try:
-        # Ensure predictions are in [0, 1] range
         pred = torch.sigmoid(pred)
-
-        # Flatten tensors for computation
-        pred_flat = pred.contiguous().view(-1)
-        target_flat = target.float().contiguous().view(-1)
-
-        # Compute intersection
+        pred_flat = pred.view(-1)
+        target_flat = target.view(-1)
         intersection = (pred_flat * target_flat).sum()
-
-        # Compute Dice coefficient
-        dice_coeff = (2. * intersection + smooth) / (pred_flat.sum() + target_flat.sum() + smooth)
-
-        # Ensure loss is non-negative
-        loss = 1 - dice_coeff.clamp(0, 1)
-
+        dice_coef = (2. * intersection + smooth) / (pred_flat.sum() + target_flat.sum() + smooth)
+        loss = 1 - dice_coef
+        # Debug statement: print the computed loss if needed
+        # print(f"Dice loss computed: {loss.item():.4f}")
     except Exception as e:
-        print(f"Error computing Dice loss: {e}")
+        print(f"[ERROR] Error computing Dice loss: {e}")
         raise e
-
     return loss
-
 
 def get_loss(loss_type):
     """
-    Returns the loss function based on the provided loss_type.
+    Returns the loss function based on the provided loss_type string.
+    
+    Args:
+        loss_type (str): Either 'bce' or 'dice'.
+    
+    Returns:
+        Function: The corresponding loss function.
     """
     try:
-        if loss_type.lower() == 'dice':
-            loss_fn = dice_loss
-        elif loss_type.lower() == 'bce':
-            loss_fn = nn.BCEWithLogitsLoss()
+        if loss_type.lower() == 'bce':
+            return bce_loss
+        elif loss_type.lower() == 'dice':
+            return dice_loss
         else:
-            raise ValueError("Unsupported loss type. Choose either 'dice' or 'bce'.")
-        print(f"Selected loss function: {loss_type}")
+            raise ValueError("Unsupported loss type. Choose either 'bce' or 'dice'.")
     except Exception as e:
-        print(f"Error selecting loss function: {e}")
+        print(f"[ERROR] Error in get_loss: {e}")
         raise e
-    return loss_fn
