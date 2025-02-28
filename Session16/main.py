@@ -14,7 +14,7 @@ from PIL import Image
 from dataset import OxfordPetDataset
 from model import UNet
 from losses import get_loss  # Returns either bce_loss or dice_loss based on input
-from trainer import train_model, run_inference_on_image, visualize_predictions
+from trainer import train_model#, run_inference_on_image, visualize_predictions
 
 def main(args):
     try:
