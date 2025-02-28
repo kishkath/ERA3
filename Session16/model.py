@@ -55,7 +55,7 @@ class Up(nn.Module):
         super(Up, self).__init__()
         try:
             self.up = nn.ConvTranspose2d(in_channels, out_channels, kernel_size=2, stride=2)
-            # After concatenation, channels double (skip connection + upsampled features).
+            # After concatenation, channels double (skip connection + upsampled features)
             self.conv = DoubleConv(in_channels, out_channels)
             print(f"Initialized Up: {in_channels} -> {out_channels}")
         except Exception as e:
@@ -65,11 +65,11 @@ class Up(nn.Module):
     def forward(self, x1, x2):
         try:
             x1 = self.up(x1)
-            # Pad x1 to match x2 dimensions.
+            # Pad x1 to match dimensions of x2.
             diffY = x2.size()[2] - x1.size()[2]
             diffX = x2.size()[3] - x1.size()[3]
             x1 = nn.functional.pad(x1, [diffX // 2, diffX - diffX // 2,
-                                        diffY // 2, diffY - diffY // 2])
+                                          diffY // 2, diffY - diffY // 2])
             # Concatenate along channel dimension.
             x = torch.cat([x2, x1], dim=1)
             out = self.conv(x)
@@ -79,7 +79,7 @@ class Up(nn.Module):
         return out
 
 class OutConv(nn.Module):
-    """Final 1x1 convolution to produce desired number of output channels."""
+    """Final 1x1 convolution to produce desired output channels."""
     def __init__(self, in_channels, out_channels):
         super(OutConv, self).__init__()
         try:
