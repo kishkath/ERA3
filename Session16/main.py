@@ -1,23 +1,29 @@
 import argparse
+import time
+import numpy as np
+import matplotlib.pyplot as plt
+from tqdm import tqdm
+
 import torch
 import torch.optim as optim
 from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader, random_split
 import torchvision.transforms as transforms
 from PIL import Image
-import numpy as np
-import matplotlib.pyplot as plt
-import time
 
 from dataset import OxfordPetDataset
 from model import UNet
-from losses import get_loss  # (kept for reference; our trainer uses calc_loss)
-from trainer import train_model
+from losses import get_loss  # Returns either bce_loss or dice_loss based on input
+from trainer import train_model, run_inference_on_image, visualize_predictions
 
 def main(args):
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(f"Using device: {device}")
-    
+    try:
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        print(f"[INFO] Using device: {device}")
+    except Exception as e:
+        print(f"[ERROR] Device selection failed: {e}")
+        return
+
     # Define transforms for images and masks.
     img_transform = transforms.Compose([
         transforms.Resize((256, 256)),
@@ -27,84 +33,147 @@ def main(args):
         transforms.Resize((256, 256), interpolation=Image.NEAREST),
         transforms.Lambda(lambda img: torch.from_numpy(np.array(img)).float().unsqueeze(0))
     ])
-    
+
+    # Prepare dataset (downloaded automatically)
     try:
-        print("Preparing dataset...")
-        full_dataset = OxfordPetDataset(root=args.data_root, split="trainval", 
-                                        transform=img_transform, mask_transform=mask_transform)
-        # Split dataset into training (80%) and validation (20%)
-        train_len = int(0.8 * len(full_dataset))
-        val_len = len(full_dataset) - train_len
-        train_dataset, val_dataset = random_split(full_dataset, [train_len, val_len])
+        print("[INFO] Loading dataset...")
+        full_dataset = OxfordPetDataset(
+            root=args.data_root,
+            split="trainval",
+            transform=img_transform,
+            mask_transform=mask_transform
+        )
+        train_size = int(0.8 * len(full_dataset))
+        val_size = len(full_dataset) - train_size
+        train_dataset, val_dataset = random_split(full_dataset, [train_size, val_size])
         dataloaders = {
             'train': DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True, num_workers=4, pin_memory=True),
             'val': DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=4, pin_memory=True)
         }
-        print("Dataset and DataLoaders are ready.")
+        print(f"[INFO] Dataset ready: {len(train_dataset)} training samples, {len(val_dataset)} validation samples.")
     except Exception as e:
-        print(f"Error preparing dataset: {e}")
+        print(f"[ERROR] Dataset preparation failed: {e}")
         return
-    
+
+    # Initialize UNet model (MaxPool + Transpose convolution)
     try:
-        print("Initializing UNet model...")
         model = UNet(n_channels=3, n_classes=1).to(device)
-        print("Model initialized successfully.")
+        print("[INFO] UNet model initialized.")
     except Exception as e:
-        print(f"Error initializing model: {e}")
+        print(f"[ERROR] Model initialization failed: {e}")
         return
-    
+
+    # Get the loss function based on the provided type ("bce" or "dice")
     try:
-        print("Setting up optimizer and scheduler...")
+        loss_fn = get_loss(args.loss_type)
+        print(f"[INFO] Using loss function: {args.loss_type}")
+    except Exception as e:
+        print(f"[ERROR] Loss function setup failed: {e}")
+        return
+
+    # Setup optimizer and scheduler
+    try:
         optimizer = optim.Adam(model.parameters(), lr=args.lr)
         scheduler = lr_scheduler.StepLR(optimizer, step_size=args.step_size, gamma=args.gamma)
-        print("Optimizer and scheduler set.")
+        print("[INFO] Optimizer and scheduler set.")
     except Exception as e:
-        print(f"Error setting up optimizer/scheduler: {e}")
+        print(f"[ERROR] Optimizer/scheduler setup failed: {e}")
         return
-    
-    try:
-        print("Starting training...")
-        model = train_model(model, dataloaders, optimizer, scheduler, num_epochs=args.epochs, device=device,
-                            checkpoint_path=args.checkpoint_path, bce_weight=args.bce_weight)
-        print("Training complete.")
-    except Exception as e:
-        print(f"Error during training: {e}")
-        return
-    
-    try:
-        if args.infer_image:
-            print(f"Running inference on image: {args.infer_image}")
-            from trainer import run_inference_on_image  # If needed, add inference function in trainer.py
-            pred_mask = run_inference_on_image(model, args.infer_image, device, img_transform)
-            image = Image.open(args.infer_image).convert("RGB").resize((256, 256))
-            plt.figure(figsize=(10, 5))
-            plt.subplot(1, 2, 1)
-            plt.title("Input Image")
-            plt.imshow(image)
-            plt.axis("off")
-            plt.subplot(1, 2, 2)
-            plt.title("Predicted Mask")
-            plt.imshow(pred_mask, cmap="gray")
-            plt.axis("off")
+
+    # Training loop
+    best_val_loss = float('inf')
+    for epoch in range(args.epochs):
+        print(f"\n[INFO] Epoch {epoch+1}/{args.epochs}")
+        epoch_start = time.time()
+
+        # Training phase
+        model.train()
+        train_loss = 0.0
+        for images, masks in tqdm(dataloaders['train'], desc="Training", leave=False):
+            try:
+                images = images.to(device).float()
+                masks = masks.to(device).float()
+                optimizer.zero_grad()
+                outputs = model(images)
+                loss = loss_fn(outputs, masks)
+                loss.backward()
+                optimizer.step()
+                train_loss += loss.item() * images.size(0)
+            except Exception as e:
+                print(f"[ERROR] Error in training batch: {e}")
+                continue
+        avg_train_loss = train_loss / len(train_dataset)
+        print(f"[INFO] Avg Train Loss: {avg_train_loss:.4f}")
+
+        # Validation phase
+        model.eval()
+        val_loss = 0.0
+        with torch.no_grad():
+            for images, masks in tqdm(dataloaders['val'], desc="Validation", leave=False):
+                try:
+                    images = images.to(device).float()
+                    masks = masks.to(device).float()
+                    outputs = model(images)
+                    loss = loss_fn(outputs, masks)
+                    val_loss += loss.item() * images.size(0)
+                except Exception as e:
+                    print(f"[ERROR] Error in validation batch: {e}")
+                    continue
+        avg_val_loss = val_loss / len(val_dataset)
+        print(f"[INFO] Avg Val Loss: {avg_val_loss:.4f}")
+
+        # Update scheduler
+        scheduler.step()
+
+        # Save the best model
+        if avg_val_loss < best_val_loss:
+            best_val_loss = avg_val_loss
+            try:
+                torch.save(model.state_dict(), args.checkpoint_path)
+                print(f"[INFO] Saved best model with loss {best_val_loss:.4f} to {args.checkpoint_path}")
+            except Exception as e:
+                print(f"[ERROR] Failed to save model: {e}")
+
+        epoch_time = time.time() - epoch_start
+        print(f"[INFO] Epoch completed in {epoch_time//60:.0f}m {epoch_time%60:.0f}s")
+
+    print("[INFO] Training complete.")
+
+    # Optional inference on a provided image
+    if args.infer_image:
+        try:
+            print(f"[INFO] Running inference on image: {args.infer_image}")
+            model.load_state_dict(torch.load(args.checkpoint_path))
+            model.eval()
+            image = Image.open(args.infer_image).convert("RGB")
+            image_resized = image.resize((256, 256))
+            image_tensor = img_transform(image_resized).to(device).float()
+            with torch.no_grad():
+                output = model(image_tensor.unsqueeze(0))
+                output = torch.sigmoid(output)
+                pred_mask = (output > 0.5).float().squeeze(0).cpu().numpy().squeeze()
+            # Visualization
+            fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+            axs[0].imshow(image_resized)
+            axs[0].set_title("Input Image")
+            axs[0].axis("off")
+            axs[1].imshow(pred_mask, cmap="gray")
+            axs[1].set_title("Predicted Mask")
+            axs[1].axis("off")
             plt.show()
-    except Exception as e:
-        print(f"Error during inference/visualization: {e}")
-    finally:
-        print("Execution completed.")
+        except Exception as e:
+            print(f"[ERROR] Inference failed: {e}")
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Modular UNet Segmentation on Oxford-IIIT Pet Dataset")
-    parser.add_argument('--data_root', type=str, default='./data',
-                        help="Path to the dataset root directory (will be downloaded automatically)")
-    parser.add_argument('--epochs', type=int, default=25, help="Number of training epochs")
+    parser = argparse.ArgumentParser(description="UNet (MaxPool+Transpose) with configurable loss")
+    parser.add_argument('--data_root', type=str, default='./data', help="Path to dataset root (downloaded automatically)")
+    parser.add_argument('--epochs', type=int, default=10, help="Number of training epochs")
     parser.add_argument('--batch_size', type=int, default=4, help="Batch size for training")
     parser.add_argument('--lr', type=float, default=1e-4, help="Learning rate")
-    parser.add_argument('--step_size', type=int, default=8, help="Scheduler step size")
-    parser.add_argument('--gamma', type=float, default=0.1, help="Scheduler gamma factor")
-    parser.add_argument('--bce_weight', type=float, default=0.5, help="Weight for BCE loss in combined loss")
-    parser.add_argument('--checkpoint_path', type=str, default="checkpoint.pth",
-                        help="Path to save the best model checkpoint")
-    parser.add_argument('--infer_image', type=str, default="",
-                        help="Path to an image file for inference (optional)")
+    parser.add_argument('--step_size', type=int, default=8, help="Step size for scheduler")
+    parser.add_argument('--gamma', type=float, default=0.1, help="Gamma factor for scheduler")
+    parser.add_argument('--loss_type', type=str, default="bce", choices=["bce", "dice"], help="Loss type to use")
+    parser.add_argument('--checkpoint_path', type=str, default="checkpoint_unet.pth", help="Path to save best model")
+    parser.add_argument('--infer_image', type=str, default="", help="Path to an image for inference (optional)")
     args = parser.parse_args()
     main(args)
