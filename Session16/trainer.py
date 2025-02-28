@@ -1,106 +1,87 @@
+from tqdm import tqdm
 import torch
-import numpy as np
-import matplotlib.pyplot as plt
-from PIL import Image
+import torch.nn.functional as F
+import time
+from collections import defaultdict
 
-def train_model(model, dataloader, optimizer, loss_fn, device):
+def calc_loss(pred, target, metrics, bce_weight=0.5, smooth=1.0):
     """
-    Trains the model for one epoch.
-    """
-    model.train()
-    running_loss = 0.0
-    try:
-        for batch_idx, (images, masks) in enumerate(dataloader):
-            images = images.to(device)
-            masks = masks.to(device)
-            optimizer.zero_grad()
-            outputs = model(images)
-            loss = loss_fn(outputs, masks)
-            loss.backward()
-            optimizer.step()
-            running_loss += loss.item() * images.size(0)
-            if batch_idx % 10 == 0:
-                print(f"Batch {batch_idx}: Loss = {loss.item():.4f}")
-    except Exception as e:
-        print(f"Error during training: {e}")
-        raise e
-    finally:
-        print("Finished training epoch.")
-    epoch_loss = running_loss / len(dataloader.dataset)
-    return epoch_loss
-
-def infer(model, image, device):
-    """
-    Performs inference on a single image tensor and returns a binary mask.
-    """
-    model.eval()
-    try:
-        with torch.no_grad():
-            image = image.to(device)
-            output = model(image.unsqueeze(0))
-            output = torch.sigmoid(output)
-            pred_mask = (output > 0.5).float()
-            print("Inference completed.")
-    except Exception as e:
-        print(f"Error during inference: {e}")
-        raise e
-    finally:
-        pass
-    return pred_mask.squeeze(0).cpu()
-
-def run_inference_on_image(model, image_path, device, transform):
-    """
-    Loads an image from the given path, applies transformation, and runs inference.
+    Calculates combined BCE and Dice loss.
+    
+    Updates the metrics dictionary with the loss components.
     """
     try:
-        image = Image.open(image_path).convert("RGB")
-        image_tensor = transform(image)
-        mask_pred = infer(model, image_tensor, device)
-        print(f"Inference done for image: {image_path}")
+        bce = F.binary_cross_entropy_with_logits(pred, target)
+        pred_sig = torch.sigmoid(pred)
+        pred_flat = pred_sig.view(-1)
+        target_flat = target.view(-1)
+        intersection = (pred_flat * target_flat).sum()
+        dice = (2. * intersection + smooth) / (pred_flat.sum() + target_flat.sum() + smooth)
+        dice_loss_val = 1 - dice
+        loss = bce * bce_weight + dice_loss_val * (1 - bce_weight)
+        metrics['bce'] += bce.item() * target.size(0)
+        metrics['dice'] += dice_loss_val.item() * target.size(0)
+        metrics['loss'] += loss.item() * target.size(0)
     except Exception as e:
-        print(f"Error in run_inference_on_image: {e}")
+        print("Error calculating loss:", e)
         raise e
-    finally:
-        pass
-    return mask_pred.numpy().squeeze()
+    return loss
 
-def visualize_predictions(model, dataset, device, num_samples=3):
+def print_metrics(metrics, epoch_samples, phase):
     """
-    Randomly selects samples from the dataset and visualizes:
-      - Input Image
-      - Ground Truth Mask
-      - Predicted Mask
+    Prints averaged metrics over an epoch.
     """
-    model.eval()
-    try:
-        indices = np.random.choice(len(dataset), num_samples, replace=False)
-        for idx in indices:
-            image, gt_mask = dataset[idx]
-            image_tensor = image.to(device)
-            with torch.no_grad():
-                output = model(image_tensor.unsqueeze(0))
-                output = torch.sigmoid(output)
-                pred_mask = (output > 0.5).float().squeeze(0)
-            
-            # Convert tensors to numpy arrays for visualization.
-            image_np = image.permute(1, 2, 0).cpu().numpy()
-            gt_mask_np = gt_mask.squeeze(0).cpu().numpy()
-            pred_mask_np = pred_mask.squeeze(0).cpu().numpy()
-            
-            fig, axs = plt.subplots(1, 3, figsize=(15, 5))
-            axs[0].imshow(image_np)
-            axs[0].set_title("Input Image")
-            axs[0].axis("off")
-            axs[1].imshow(gt_mask_np, cmap="gray")
-            axs[1].set_title("Ground Truth Mask")
-            axs[1].axis("off")
-            axs[2].imshow(pred_mask_np, cmap="gray")
-            axs[2].set_title("Predicted Mask")
-            axs[2].axis("off")
-            plt.show()
-            print(f"Visualized sample index {idx}")
-    except Exception as e:
-        print(f"Error during visualization: {e}")
-        raise e
-    finally:
-        print("Finished visualizing predictions.")
+    outputs = []
+    for k in metrics.keys():
+        outputs.append("{}: {:4f}".format(k, metrics[k] / epoch_samples))
+    print("{}: {}".format(phase, ", ".join(outputs)))
+
+def train_model(model, dataloaders, optimizer, scheduler, num_epochs=25, device="cuda", checkpoint_path="checkpoint.pth", bce_weight=0.5):
+    """
+    Trains the model using both training and validation phases.
+    Uses tqdm for progress display and saves the best model based on validation loss.
+    """
+    best_loss = float('inf')
+    for epoch in range(num_epochs):
+        print('Epoch {}/{}'.format(epoch, num_epochs - 1))
+        print('-' * 10)
+        since = time.time()
+        for phase in ['train', 'val']:
+            if phase == 'train':
+                model.train()
+            else:
+                model.eval()
+            metrics = defaultdict(float)
+            epoch_samples = 0
+            pbar = tqdm(dataloaders[phase], desc=phase)
+            for inputs, labels in pbar:
+                try:
+                    inputs = inputs.to(device).float()
+                    labels = labels.to(device).float()
+                    optimizer.zero_grad()
+                    with torch.set_grad_enabled(phase == 'train'):
+                        outputs = model(inputs)
+                        loss = calc_loss(outputs, labels, metrics, bce_weight=bce_weight)
+                        if phase == 'train':
+                            loss.backward()
+                            optimizer.step()
+                    epoch_samples += inputs.size(0)
+                    pbar.set_postfix(loss=loss.item())
+                except Exception as e:
+                    print("Error during batch processing:", e)
+                    raise e
+            print_metrics(metrics, epoch_samples, phase)
+            epoch_loss = metrics['loss'] / epoch_samples
+            if phase == 'train':
+                scheduler.step()
+                for param_group in optimizer.param_groups:
+                    print("Learning Rate:", param_group['lr'])
+            if phase == 'val' and epoch_loss < best_loss:
+                print(f"Saving best model to {checkpoint_path}")
+                best_loss = epoch_loss
+                torch.save(model.state_dict(), checkpoint_path)
+        time_elapsed = time.time() - since
+        print('Epoch completed in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
+    print('Best val loss: {:4f}'.format(best_loss))
+    model.load_state_dict(torch.load(checkpoint_path))
+    return model
