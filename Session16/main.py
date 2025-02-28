@@ -25,10 +25,9 @@ def main(args):
         transforms.Lambda(lambda img: torch.from_numpy(np.array(img)).float().unsqueeze(0))
     ])
     
-    # Prepare the dataset and dataloader.
-    train_dataset = OxfordPetDataset(root=args.data_root, 
-                                     transform=img_transform, 
-                                     mask_transform=mask_transform)
+    # Prepare the dataset. The OxfordPetDataset now downloads the data automatically.
+    train_dataset = OxfordPetDataset(root=args.data_root, split="trainval", 
+                                     transform=img_transform, mask_transform=mask_transform)
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, 
                               shuffle=True, num_workers=4, pin_memory=True)
     
@@ -73,18 +72,18 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Modular UNet Segmentation on Oxford-IIIT Pet Dataset")
-    parser.add_argument('--data_root', type=str, required=True,
-                        help="Path to the Oxford-IIIT Pet dataset root directory.")
+    parser.add_argument('--data_root', type=str, default='./data',
+                        help="Path to the dataset root directory (downloaded automatically)")
     parser.add_argument('--loss_type', type=str, default='dice', choices=['dice', 'bce'],
-                        help="Loss function to use: dice or bce.")
-    parser.add_argument('--epochs', type=int, default=25, help="Number of training epochs.")
-    parser.add_argument('--batch_size', type=int, default=4, help="Batch size for training.")
-    parser.add_argument('--lr', type=float, default=1e-4, help="Learning rate.")
+                        help="Loss function to use: dice or bce")
+    parser.add_argument('--epochs', type=int, default=25, help="Number of training epochs")
+    parser.add_argument('--batch_size', type=int, default=4, help="Batch size for training")
+    parser.add_argument('--lr', type=float, default=1e-4, help="Learning rate")
     parser.add_argument('--infer_image', type=str, default="",
-                        help="Path to an image file for inference (optional).")
+                        help="Path to an image file for inference (optional)")
     parser.add_argument('--visualize', action='store_true',
-                        help="Flag to visualize sample predictions from the dataset.")
+                        help="Flag to visualize sample predictions from the dataset")
     parser.add_argument('--num_visualizations', type=int, default=3,
-                        help="Number of sample visualizations to display.")
+                        help="Number of sample visualizations to display")
     args = parser.parse_args()
     main(args)
