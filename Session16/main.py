@@ -59,12 +59,12 @@ def main(args):
         model = UNet(n_channels=3, n_classes=1).to(device)
         print("[INFO] UNet model initialized.")
         # Display model summary using torchsummary if available.
-        try:
-            print("[INFO] Getting model architecture")
-            from torchsummary import summary
-            summary(model, (3, 128, 128))
-        except ImportError:
-            print("[WARN] torchsummary not installed. Skipping model summary.")
+        # try:
+        #     print("[INFO] Getting model architecture")
+        #     from torchsummary import summary
+        #     summary(model, (3, 128, 128))
+        # except ImportError:
+        #     print("[WARN] torchsummary not installed. Skipping model summary.")
     except Exception as e:
         print(f"[ERROR] Model initialization failed: {e}")
         return
