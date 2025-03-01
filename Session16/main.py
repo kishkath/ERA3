@@ -61,7 +61,7 @@ def main(args):
         # Display model summary using torchsummary if available.
         try:
             from torchsummary import summary
-            summary(model, (3, 256, 256))
+            summary(model, (3, 128, 128))
         except ImportError:
             print("[WARN] torchsummary not installed. Skipping model summary.")
     except Exception as e:
