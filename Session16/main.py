@@ -13,10 +13,8 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 from PIL import Image
 
-
-from utils import plot_imgs
 # Import our custom dataset, UNet model, and loss function helper.
-from dataset import CustomDataset
+from dataset import CustomDataset  # This file now auto-downloads the dataset if needed.
 from model import UNet
 from losses import get_loss  # Returns either bce_loss or dice_loss based on input
 from trainer import train_one_epoch, validate_one_epoch
@@ -37,7 +35,7 @@ def main(args):
         ToTensorV2()
     ])
 
-    # Set the dataset paths (as downloaded via torchvision)
+    # Set the dataset paths based on the downloaded folder.
     imgs_path = os.path.join(args.data_root, "images")
     masks_path = os.path.join(args.data_root, "annotations", "trimaps")
     
@@ -52,17 +50,11 @@ def main(args):
             'val': DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=4, pin_memory=True)
         }
         print(f"[INFO] Dataset ready: {len(train_dataset)} training samples, {len(val_dataset)} validation samples.")
-        
-        # ... After you have created train_dataset or a list of samples ...
-        # For example, to visualize the first 15 samples with both images and masks:
-        print(f"[INFO] Plotting Images: ")
-        plot_imgs(train_dataset, num_images=15, mode="both", save_path="train_samples.png")
-
     except Exception as e:
         print(f"[ERROR] Dataset preparation failed: {e}")
         return
 
-    # Initialize UNet model (with MaxPool and Transpose Convolution)
+    # Initialize UNet model (MaxPool + Transpose Convolution)
     try:
         model = UNet(n_channels=3, n_classes=1).to(device)
         print("[INFO] UNet model initialized.")
@@ -87,7 +79,7 @@ def main(args):
         print(f"[ERROR] Optimizer/scheduler setup failed: {e}")
         return
 
-    # Training and Validation loop (using functions from trainer.py)
+    # Training and validation loop using separated functions
     best_val_loss = float('inf')
     for epoch in range(args.epochs):
         print(f"\n[INFO] Epoch {epoch+1}/{args.epochs}")
@@ -124,7 +116,6 @@ def main(args):
             model.eval()
             image = Image.open(args.infer_image).convert("RGB")
             image_resized = image.resize((256, 256))
-            # Albumentations expects a numpy array
             image_np = np.array(image_resized)
             transformed = train_transforms(image=image_np)
             image_tensor = transformed["image"].to(device).float()
@@ -146,8 +137,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="UNet (MaxPool+Transpose) with configurable loss, cleaning & normalization")
-    # The data_root should point to the base folder (e.g., "./data/oxford-iiit-pet") downloaded via torchvision.
-    parser.add_argument('--data_root', type=str, default='./data/oxford-iiit-pet', help="Path to dataset root")
+    parser.add_argument('--data_root', type=str, default='./data/oxford-iiit-pet', help="Path to dataset root (downloaded via torchvision)")
     parser.add_argument('--epochs', type=int, default=10, help="Number of training epochs")
     parser.add_argument('--batch_size', type=int, default=4, help="Batch size for training")
     parser.add_argument('--lr', type=float, default=1e-4, help="Learning rate")
