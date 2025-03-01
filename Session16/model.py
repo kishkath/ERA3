@@ -14,7 +14,6 @@ class DoubleConv(nn.Module):
                 nn.BatchNorm2d(out_channels),
                 nn.ReLU(inplace=True)
             )
-            # print(f"Initialized DoubleConv: {in_channels} -> {out_channels}")
         except Exception as e:
             print(f"Error initializing DoubleConv: {e}")
             raise e
@@ -36,7 +35,6 @@ class Down(nn.Module):
                 nn.MaxPool2d(2),
                 DoubleConv(in_channels, out_channels)
             )
-            # print(f"Initialized Down: {in_channels} -> {out_channels}")
         except Exception as e:
             print(f"Error initializing Down: {e}")
             raise e
@@ -55,9 +53,9 @@ class Up(nn.Module):
         super(Up, self).__init__()
         try:
             self.up = nn.ConvTranspose2d(in_channels, out_channels, kernel_size=2, stride=2)
-            # After concatenation, channels double (skip connection + upsampled features)
+            # After concatenation, the number of channels is (skip_channels + upsampled channels).
+            # We then process this with DoubleConv.
             self.conv = DoubleConv(in_channels, out_channels)
-            # print(f"Initialized Up: {in_channels} -> {out_channels}")
         except Exception as e:
             print(f"Error initializing Up: {e}")
             raise e
@@ -65,12 +63,12 @@ class Up(nn.Module):
     def forward(self, x1, x2):
         try:
             x1 = self.up(x1)
-            # Pad x1 to match dimensions of x2.
-            diffY = x2.size()[2] - x1.size()[2]
-            diffX = x2.size()[3] - x1.size()[3]
+            # Ensure dimensions match by padding x1 if needed.
+            diffY = x2.size(2) - x1.size(2)
+            diffX = x2.size(3) - x1.size(3)
             x1 = nn.functional.pad(x1, [diffX // 2, diffX - diffX // 2,
                                           diffY // 2, diffY - diffY // 2])
-            # Concatenate along channel dimension.
+            # Concatenate along channels
             x = torch.cat([x2, x1], dim=1)
             out = self.conv(x)
         except Exception as e:
@@ -84,7 +82,6 @@ class OutConv(nn.Module):
         super(OutConv, self).__init__()
         try:
             self.conv = nn.Conv2d(in_channels, out_channels, kernel_size=1)
-            # print(f"Initialized OutConv: {in_channels} -> {out_channels}")
         except Exception as e:
             print(f"Error initializing OutConv: {e}")
             raise e
@@ -117,11 +114,11 @@ class Encoder(nn.Module):
 
     def forward(self, x):
         try:
-            x1 = self.initial(x)
-            x2 = self.down1(x1)
-            x3 = self.down2(x2)
-            x4 = self.down3(x3)
-            x5 = self.down4(x4)
+            x1 = self.initial(x)    # Output of first block
+            x2 = self.down1(x1)     # Downsampled output 2
+            x3 = self.down2(x2)     # Downsampled output 3
+            x4 = self.down3(x3)     # Downsampled output 4
+            x5 = self.down4(x4)     # Bottleneck
             features = (x1, x2, x3, x4, x5)
         except Exception as e:
             print(f"Error in Encoder forward pass: {e}")
@@ -168,7 +165,7 @@ class UNet(nn.Module):
         try:
             self.encoder = Encoder(in_channels=n_channels)
             self.decoder = Decoder(n_classes=n_classes)
-            print("UNet model with [Maxpool(Compression) and Transpose convolution(Expansion)] were used and initialized successfully.")
+            print("UNet model with [MaxPool and Transpose Convolution] was initialized successfully.")
         except Exception as e:
             print(f"Error initializing UNet: {e}")
             raise e
