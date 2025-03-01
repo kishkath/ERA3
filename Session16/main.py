@@ -13,10 +13,11 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 from PIL import Image
 
-# Import our custom dataset, UNet model, and unified loss function
+# Import our custom dataset, UNet model, and loss function helper.
 from dataset import CustomDataset
 from model import UNet
 from losses import get_loss  # Returns either bce_loss or dice_loss based on input
+from trainer import train_one_epoch, validate_one_epoch
 
 def main(args):
     try:
@@ -26,19 +27,19 @@ def main(args):
         print(f"[ERROR] Device selection failed: {e}")
         return
 
-    # Define Albumentations transforms for images (applied to both training and inference)
+    # Define Albumentations transforms for images and masks.
     train_transforms = A.Compose([
         A.Resize(256, 256),
         A.Normalize(mean=(0.485, 0.456, 0.406),
                     std=(0.229, 0.224, 0.225)),
         ToTensorV2()
     ])
-    # Note: masks are processed in the dataset (and are not normalized)
 
-    # Prepare dataset using our CustomDataset which cleans corrupted files and unwanted names
+    # Set the dataset paths (as downloaded via torchvision)
+    imgs_path = os.path.join(args.data_root, "images")
+    masks_path = os.path.join(args.data_root, "annotations", "trimaps")
+    
     try:
-        imgs_path = os.path.join(args.data_root, "images")
-        masks_path = os.path.join(args.data_root, "annotations", "trimaps")
         print("[INFO] Loading dataset using CustomDataset...")
         full_dataset = CustomDataset(imgs_path, masks_path, transforms=train_transforms)
         train_size = int(0.8 * len(full_dataset))
@@ -78,65 +79,35 @@ def main(args):
         print(f"[ERROR] Optimizer/scheduler setup failed: {e}")
         return
 
-    # Training loop
+    # Training and Validation loop (using functions from trainer.py)
     best_val_loss = float('inf')
     for epoch in range(args.epochs):
         print(f"\n[INFO] Epoch {epoch+1}/{args.epochs}")
         epoch_start = time.time()
-
-        # Training phase
-        model.train()
-        train_loss = 0.0
-        for images, masks in tqdm(dataloaders['train'], desc="Training", leave=False):
-            try:
-                images = images.to(device).float()
-                masks = masks.to(device).float()
-                optimizer.zero_grad()
-                outputs = model(images)
-                loss = loss_fn(outputs, masks)
-                loss.backward()
-                optimizer.step()
-                train_loss += loss.item() * images.size(0)
-            except Exception as e:
-                print(f"[ERROR] Error in training batch: {e}")
-                continue
-        avg_train_loss = train_loss / len(train_dataset)
-        print(f"[INFO] Avg Train Loss: {avg_train_loss:.4f}")
-
-        # Validation phase
-        model.eval()
-        val_loss = 0.0
-        with torch.no_grad():
-            for images, masks in tqdm(dataloaders['val'], desc="Validation", leave=False):
-                try:
-                    images = images.to(device).float()
-                    masks = masks.to(device).float()
-                    outputs = model(images)
-                    loss = loss_fn(outputs, masks)
-                    val_loss += loss.item() * images.size(0)
-                except Exception as e:
-                    print(f"[ERROR] Error in validation batch: {e}")
-                    continue
-        avg_val_loss = val_loss / len(val_dataset)
-        print(f"[INFO] Avg Val Loss: {avg_val_loss:.4f}")
-
+        
+        train_loss, train_acc = train_one_epoch(model, dataloaders['train'], optimizer, loss_fn, device, epoch)
+        print(f"[INFO] Epoch {epoch+1}: Avg Train Loss: {train_loss:.4f} | Train Accuracy: {train_acc:.2f}%")
+        
+        val_loss, val_acc = validate_one_epoch(model, dataloaders['val'], loss_fn, device, epoch)
+        print(f"[INFO] Epoch {epoch+1}: Avg Val Loss: {val_loss:.4f} | Val Accuracy: {val_acc:.2f}%")
+        
         # Update scheduler
         scheduler.step()
-
-        # Save the best model
-        if avg_val_loss < best_val_loss:
-            best_val_loss = avg_val_loss
+        
+        # Save best model
+        if val_loss < best_val_loss:
+            best_val_loss = val_loss
             try:
                 torch.save(model.state_dict(), args.checkpoint_path)
                 print(f"[INFO] Saved best model with loss {best_val_loss:.4f} to {args.checkpoint_path}")
             except Exception as e:
                 print(f"[ERROR] Failed to save model: {e}")
-
+        
         epoch_time = time.time() - epoch_start
         print(f"[INFO] Epoch completed in {epoch_time//60:.0f}m {epoch_time%60:.0f}s")
-
+    
     print("[INFO] Training complete.")
-
+    
     # Optional inference on a provided image
     if args.infer_image:
         try:
@@ -167,6 +138,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="UNet (MaxPool+Transpose) with configurable loss, cleaning & normalization")
+    # The data_root should point to the base folder (e.g., "./data/oxford-iiit-pet") downloaded via torchvision.
     parser.add_argument('--data_root', type=str, default='./data/oxford-iiit-pet', help="Path to dataset root")
     parser.add_argument('--epochs', type=int, default=10, help="Number of training epochs")
     parser.add_argument('--batch_size', type=int, default=4, help="Batch size for training")
