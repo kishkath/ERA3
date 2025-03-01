@@ -1,87 +1,86 @@
 from tqdm import tqdm
 import torch
 import torch.nn.functional as F
-import time
-from collections import defaultdict
 
-def calc_loss(pred, target, metrics, bce_weight=0.5, smooth=1.0):
+def train_one_epoch(model, train_loader, optimizer, loss_fn, device, epoch):
     """
-    Calculates combined BCE and Dice loss.
+    Runs one training epoch.
     
-    Updates the metrics dictionary with the loss components.
+    Args:
+        model (torch.nn.Module): The segmentation model.
+        train_loader (DataLoader): Training data loader.
+        optimizer (torch.optim.Optimizer): Optimizer.
+        loss_fn (function): Loss function (e.g., bce_loss or dice_loss).
+        device (torch.device): Device to run computations on.
+        epoch (int): Current epoch (for logging purposes).
+        
+    Returns:
+        tuple: Average training loss, pixel-wise training accuracy.
     """
-    try:
-        bce = F.binary_cross_entropy_with_logits(pred, target)
-        pred_sig = torch.sigmoid(pred)
-        pred_flat = pred_sig.view(-1)
-        target_flat = target.view(-1)
-        intersection = (pred_flat * target_flat).sum()
-        dice = (2. * intersection + smooth) / (pred_flat.sum() + target_flat.sum() + smooth)
-        dice_loss_val = 1 - dice
-        loss = bce * bce_weight + dice_loss_val * (1 - bce_weight)
-        metrics['bce'] += bce.item() * target.size(0)
-        metrics['dice'] += dice_loss_val.item() * target.size(0)
-        metrics['loss'] += loss.item() * target.size(0)
-    except Exception as e:
-        print("Error calculating loss:", e)
-        raise e
-    return loss
+    model.train()
+    running_loss = 0.0
+    correct = 0
+    total_pixels = 0
+    pbar = tqdm(train_loader, desc=f"Training Epoch {epoch+1}", leave=False)
+    
+    for images, masks in pbar:
+        try:
+            images = images.to(device).float()
+            masks = masks.to(device).float()
+            optimizer.zero_grad()
+            outputs = model(images)
+            loss = loss_fn(outputs, masks)
+            loss.backward()
+            optimizer.step()
+            running_loss += loss.item() * images.size(0)
+            
+            # For segmentation with 1 output channel, threshold the sigmoid outputs at 0.5.
+            preds = (torch.sigmoid(outputs) > 0.5).float()
+            correct += (preds.eq(masks).sum().item())
+            total_pixels += masks.numel()
+            pbar.set_postfix(loss=f"{loss.item():.4f}")
+        except Exception as e:
+            print(f"[ERROR] Training batch error: {e}")
+            continue
+    avg_loss = running_loss / len(train_loader.dataset)
+    accuracy = 100 * correct / total_pixels if total_pixels > 0 else 0
+    return avg_loss, accuracy
 
-def print_metrics(metrics, epoch_samples, phase):
+def validate_one_epoch(model, val_loader, loss_fn, device, epoch):
     """
-    Prints averaged metrics over an epoch.
+    Runs one validation epoch.
+    
+    Args:
+        model (torch.nn.Module): The segmentation model.
+        val_loader (DataLoader): Validation data loader.
+        loss_fn (function): Loss function.
+        device (torch.device): Device to run computations on.
+        epoch (int): Current epoch (for logging purposes).
+        
+    Returns:
+        tuple: Average validation loss, pixel-wise validation accuracy.
     """
-    outputs = []
-    for k in metrics.keys():
-        outputs.append("{}: {:4f}".format(k, metrics[k] / epoch_samples))
-    print("{}: {}".format(phase, ", ".join(outputs)))
-
-def train_model(model, dataloaders, optimizer, scheduler, num_epochs=25, device="cuda", checkpoint_path="checkpoint.pth", bce_weight=0.5):
-    """
-    Trains the model using both training and validation phases.
-    Uses tqdm for progress display and saves the best model based on validation loss.
-    """
-    best_loss = float('inf')
-    for epoch in range(num_epochs):
-        print('Epoch {}/{}'.format(epoch, num_epochs - 1))
-        print('-' * 10)
-        since = time.time()
-        for phase in ['train', 'val']:
-            if phase == 'train':
-                model.train()
-            else:
-                model.eval()
-            metrics = defaultdict(float)
-            epoch_samples = 0
-            pbar = tqdm(dataloaders[phase], desc=phase)
-            for inputs, labels in pbar:
-                try:
-                    inputs = inputs.to(device).float()
-                    labels = labels.to(device).float()
-                    optimizer.zero_grad()
-                    with torch.set_grad_enabled(phase == 'train'):
-                        outputs = model(inputs)
-                        loss = calc_loss(outputs, labels, metrics, bce_weight=bce_weight)
-                        if phase == 'train':
-                            loss.backward()
-                            optimizer.step()
-                    epoch_samples += inputs.size(0)
-                    pbar.set_postfix(loss=loss.item())
-                except Exception as e:
-                    print("Error during batch processing:", e)
-                    raise e
-            print_metrics(metrics, epoch_samples, phase)
-            epoch_loss = metrics['loss'] / epoch_samples
-            if phase == 'train':
-                scheduler.step()
-                for param_group in optimizer.param_groups:
-                    print("Learning Rate:", param_group['lr'])
-            if phase == 'val' and epoch_loss < best_loss:
-                print(f"Saving best model to {checkpoint_path}")
-                best_loss = epoch_loss
-                torch.save(model.state_dict(), checkpoint_path)
-        time_elapsed = time.time() - since
-        print('Epoch completed in {:.0f}m {:.0f}s'.format(time_elapsed // 60, time_elapsed % 60))
-    print('Best val loss: {:4f}'.format(best_loss))
-    model.load_state_dict(torch.load(checkpoint_path))
-    return model
+    model.eval()
+    running_loss = 0.0
+    correct = 0
+    total_pixels = 0
+    pbar = tqdm(val_loader, desc=f"Validation Epoch {epoch+1}", leave=False)
+    
+    with torch.no_grad():
+        for images, masks in pbar:
+            try:
+                images = images.to(device).float()
+                masks = masks.to(device).float()
+                outputs = model(images)
+                loss = loss_fn(outputs, masks)
+                running_loss += loss.item() * images.size(0)
+                preds = (torch.sigmoid(outputs) > 0.5).float()
+                correct += (preds.eq(masks).sum().item())
+                total_pixels += masks.numel()
+                pbar.set_postfix(loss=f"{loss.item():.4f}")
+            except Exception as e:
+                print(f"[ERROR] Validation batch error: {e}")
+                continue
+    avg_loss = running_loss / len(val_loader.dataset)
+    accuracy = 100 * correct / total_pixels if total_pixels > 0 else 0
+    return avg_loss, accuracy
