@@ -3,12 +3,22 @@ import cv2
 import numpy as np
 import torch
 from torch.utils.data import Dataset
+import torchvision.datasets as dset
+
+# Automatically download the Oxford-IIIT Pet dataset if not already present.
+# This will create the folder "./data/oxford-iiit-pet" with the appropriate subdirectories.
+DATASET_ROOT = "./data/oxford-iiit-pet"
+if not os.path.exists(DATASET_ROOT):
+    print("Dataset not found. Downloading Oxford-IIIT Pet dataset via torchvision...")
+    _ = dset.OxfordIIITPet("./data", split="trainval", target_types="segmentation", download=True)
+else:
+    print("Dataset already exists.")
 
 def preprocessing_mask(mask):
     """
     Preprocess the input mask for segmentation.
     
-    The function converts the mask to float32, then:
+    Converts the mask to float32 and:
       - Sets pixels with value 2.0 to 0.0 (background).
       - Sets pixels with value 1.0 or 3.0 to 1.0 (foreground).
     
@@ -25,46 +35,50 @@ def preprocessing_mask(mask):
 
 class CustomDataset(Dataset):
     """
-    Custom Dataset for segmentation tasks.
+    Custom Dataset for segmentation tasks using the Oxford-IIIT Pet dataset.
     
     This dataset:
-      - Reads image filenames from `images_path`, excluding files with unwanted extensions.
-      - Derives corresponding mask filenames (assumed to be the same base name with a .png extension)
-      - Removes any corrupted image files (and their corresponding masks) from the lists.
-      - Optionally applies Albumentations transforms.
+      - Expects images in `images_path` (e.g., "./data/oxford-iiit-pet/images/")
+      - Expects masks in `masks_path` (e.g., "./data/oxford-iiit-pet/annotations/trimaps/")
+      - Filters out unwanted files (such as those ending with ".mat" or starting with "._")
+      - Removes any corrupted files from the lists.
+      - Applies Albumentations transforms if provided.
     
     Args:
         images_path (str): Directory containing images.
-        masks_path (str): Directory containing masks.
+        masks_path (str): Directory containing masks (typically the "trimaps" folder).
         transforms (albumentations.Compose, optional): Albumentations transforms to apply.
     """
     def __init__(self, images_path, masks_path, transforms=None):
         self.images_path = images_path
         self.masks_path = masks_path
-        # Exclude files ending with ".mat" (or any other unwanted extensions)
-        self.images_list = [i for i in os.listdir(images_path) if not i.endswith(".mat")]
-        # Derive mask filenames: for each image, mask name is the base name + ".png"
-        self.masks_list = [os.path.splitext(file_name)[0] + ".png" for file_name in self.images_list]
 
-        # Remove corrupted images (and corresponding masks)
-        corrupted_file_names = []
-        for file in self.images_list:
-            img_read = cv2.imread(os.path.join(images_path, file), 1)
+        # List images, filtering out unwanted files (e.g. ".mat" and files starting with "._")
+        all_imgs = [i for i in os.listdir(images_path) if (not i.endswith(".mat")) and (not i.startswith("._"))]
+        # Derive mask filenames: for each image, mask name is the base name + ".png"
+        all_masks = [os.path.splitext(file_name)[0] + ".png" for file_name in all_imgs]
+
+        # Remove corrupted files (check images with OpenCV)
+        corrupted_imgs = []
+        for file in all_imgs:
+            img_full_path = os.path.join(images_path, file)
+            img_read = cv2.imread(img_full_path, 1)
             if img_read is None:
-                corrupted_file_names.append(file)
-        corrupted_mask_names = [f[:-4] + ".png" for f in corrupted_file_names]
-        print("Before Removing: ", len(self.images_list), len(self.masks_list))
-        for file in corrupted_file_names:
-            self.images_list.remove(file)
-        for file in corrupted_mask_names:
-            if file in self.masks_list:
-                self.masks_list.remove(file)
-        print("After Removing: ", len(self.images_list), len(self.masks_list))
-        
-        # Sort the lists to ensure correct pairing
-        self.images_list = sorted(self.images_list)
-        self.masks_list = sorted(self.masks_list)
-        
+                corrupted_imgs.append(file)
+        # Determine corresponding mask names for corrupted images.
+        corrupted_masks = [f[:-4] + ".png" for f in corrupted_imgs]
+
+        print("Before Removing: ", len(all_imgs), len(all_masks))
+        for file in corrupted_imgs:
+            all_imgs.remove(file)
+        for file in corrupted_masks:
+            if file in all_masks:
+                all_masks.remove(file)
+        print("After Removing: ", len(all_imgs), len(all_masks))
+
+        # Sort lists to ensure correct pairing.
+        self.images_list = sorted(all_imgs)
+        self.masks_list = sorted(all_masks)
         self.transforms = transforms
 
     def __len__(self):
@@ -72,56 +86,25 @@ class CustomDataset(Dataset):
     
     def __getitem__(self, index):
         image_name = self.images_list[index]
-        image_path_full = os.path.join(self.images_path, image_name)
-        # Read the image using OpenCV and convert BGR to RGB
-        image = cv2.imread(image_path_full)
+        image_full_path = os.path.join(self.images_path, image_name)
+        image = cv2.imread(image_full_path)
         if image is None:
-            raise ValueError(f"Failed to read image: {image_path_full}")
+            raise ValueError(f"Failed to read image: {image_full_path}")
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         
-        # Derive the corresponding mask filename (assumes .png extension)
         mask_name = os.path.splitext(image_name)[0] + ".png"
-        mask_path_full = os.path.join(self.masks_path, mask_name)
-        mask = cv2.imread(mask_path_full, -1)  # Read mask in its original format
+        mask_full_path = os.path.join(self.masks_path, mask_name)
+        mask = cv2.imread(mask_full_path, -1)
         if mask is None:
-            raise ValueError(f"Failed to read mask: {mask_path_full}")
+            raise ValueError(f"Failed to read mask: {mask_full_path}")
         mask = preprocessing_mask(mask)
         
-        # Apply Albumentations transforms if provided.
         if self.transforms:
             transformed = self.transforms(image=image, mask=mask)
             image = transformed["image"]
             mask = transformed["mask"]
-            # Ensure mask has a channel dimension (e.g., shape (1, H, W))
+            # Ensure mask has a channel dimension (shape: [1, H, W])
             if mask.ndim == 2:
                 mask = mask.unsqueeze(0)
         
         return image, mask
-
-# Example usage:
-if __name__ == "__main__":
-    import albumentations as A
-    from albumentations.pytorch import ToTensorV2
-
-    # Define paths
-    imgs_path = "/kaggle/working/data/oxford-iiit-pet/images/"
-    masks_path = "/kaggle/working/data/oxford-iiit-pet/annotations/trimaps/"
-    
-    # Print file counts before cleaning
-    imgs_lst = os.listdir(imgs_path)
-    print(f"Initial number of images: {len(imgs_lst)}")
-    
-    # Define Albumentations transforms (including normalization)
-    train_transforms = A.Compose([
-        A.Resize(256, 256),
-        A.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
-        ToTensorV2()
-    ])
-    
-    # Create dataset instance
-    dataset = CustomDataset(imgs_path, masks_path, transforms=train_transforms)
-    print(f"Dataset length after cleaning: {len(dataset)}")
-    
-    # Retrieve and inspect one sample
-    image, mask = dataset[0]
-    print(f"Image shape: {image.shape}, Mask shape: {mask.shape}")
