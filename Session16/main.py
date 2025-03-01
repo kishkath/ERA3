@@ -62,11 +62,14 @@ def main(args):
     try:
         model_type = args.model_type.lower()
         if model_type == "unet":
-            from model import UNet
+            print("[INFO] Maxpool as Encoder & Transpose conv as Decoder")
+            from unet_maxpool_transpose.model import UNet
         elif model_type == "strided_transpose":
-            from strided_unet_transpose.model import UNet
+            print("[INFO] Strided as Encoder & Transpose Conv as Decoder")
+            from unet_strided_transpose.model import UNet
         elif model_type == "strided_upsample":
-            from strided_unet_upsample.model import UNet
+            print("[INFO] Strided as Encoder & Upsampling as Decoder")
+            from unet_strided_upsample.model import UNet
         else:
             raise ValueError(f"Unknown model type: {args.model_type}")
         model = UNet(n_channels=3, n_classes=1).to(device)
