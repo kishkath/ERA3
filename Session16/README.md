@@ -1,7 +1,3 @@
-Below is an example README file that explains the project, how to run the different UNet variants with different losses, and includes details on the directory structure, requirements, usage instructions, and expected results.
-
----
-
 # UNet Segmentation Assignment
 
 This assignment is to train your own UNet from scratch for image segmentation on the Oxford-IIIT Pet dataset. The goal is to train the network four times with different configurations:
