@@ -1,5 +1,6 @@
 import argparse
 import time
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
@@ -8,13 +9,14 @@ import torch
 import torch.optim as optim
 from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader, random_split
-import torchvision.transforms as transforms
+import albumentations as A
+from albumentations.pytorch import ToTensorV2
 from PIL import Image
 
-from dataset import OxfordPetDataset
+# Import our custom dataset, UNet model, and unified loss function
+from dataset import CustomDataset
 from model import UNet
 from losses import get_loss  # Returns either bce_loss or dice_loss based on input
-from trainer import train_model  # (Optional: if you want to use additional trainer functions)
 
 def main(args):
     try:
@@ -24,28 +26,21 @@ def main(args):
         print(f"[ERROR] Device selection failed: {e}")
         return
 
-    # Define transforms for images and masks.
-    # Here we add normalization after converting to tensor.
-    img_transform = transforms.Compose([
-        transforms.Resize((256, 256)),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=(0.485, 0.456, 0.406),  # Normalization parameters
-                             std=(0.229, 0.224, 0.225))
+    # Define Albumentations transforms for images (applied to both training and inference)
+    train_transforms = A.Compose([
+        A.Resize(256, 256),
+        A.Normalize(mean=(0.485, 0.456, 0.406),
+                    std=(0.229, 0.224, 0.225)),
+        ToTensorV2()
     ])
-    mask_transform = transforms.Compose([
-        transforms.Resize((256, 256), interpolation=Image.NEAREST),
-        transforms.Lambda(lambda img: torch.from_numpy(np.array(img)).float().unsqueeze(0))
-    ])
+    # Note: masks are processed in the dataset (and are not normalized)
 
-    # Prepare dataset (downloaded automatically)
+    # Prepare dataset using our CustomDataset which cleans corrupted files and unwanted names
     try:
-        print("[INFO] Loading dataset...")
-        full_dataset = OxfordPetDataset(
-            root=args.data_root,
-            split="trainval",
-            transform=img_transform,
-            mask_transform=mask_transform
-        )
+        imgs_path = os.path.join(args.data_root, "images")
+        masks_path = os.path.join(args.data_root, "annotations", "trimaps")
+        print("[INFO] Loading dataset using CustomDataset...")
+        full_dataset = CustomDataset(imgs_path, masks_path, transforms=train_transforms)
         train_size = int(0.8 * len(full_dataset))
         val_size = len(full_dataset) - train_size
         train_dataset, val_dataset = random_split(full_dataset, [train_size, val_size])
@@ -58,7 +53,7 @@ def main(args):
         print(f"[ERROR] Dataset preparation failed: {e}")
         return
 
-    # Initialize UNet model (MaxPool + Transpose convolution)
+    # Initialize UNet model (with MaxPool and Transpose Convolution)
     try:
         model = UNet(n_channels=3, n_classes=1).to(device)
         print("[INFO] UNet model initialized.")
@@ -66,7 +61,7 @@ def main(args):
         print(f"[ERROR] Model initialization failed: {e}")
         return
 
-    # Get the loss function based on the provided type ("bce" or "dice")
+    # Get the loss function based on provided type ("bce" or "dice")
     try:
         loss_fn = get_loss(args.loss_type)
         print(f"[INFO] Using loss function: {args.loss_type}")
@@ -150,7 +145,10 @@ def main(args):
             model.eval()
             image = Image.open(args.infer_image).convert("RGB")
             image_resized = image.resize((256, 256))
-            image_tensor = img_transform(image_resized).to(device).float()
+            # Albumentations expects a numpy array
+            image_np = np.array(image_resized)
+            transformed = train_transforms(image=image_np)
+            image_tensor = transformed["image"].to(device).float()
             with torch.no_grad():
                 output = model(image_tensor.unsqueeze(0))
                 output = torch.sigmoid(output)
@@ -168,8 +166,8 @@ def main(args):
             print(f"[ERROR] Inference failed: {e}")
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="UNet (MaxPool+Transpose) with configurable loss and normalization")
-    parser.add_argument('--data_root', type=str, default='./data', help="Path to dataset root (downloaded automatically)")
+    parser = argparse.ArgumentParser(description="UNet (MaxPool+Transpose) with configurable loss, cleaning & normalization")
+    parser.add_argument('--data_root', type=str, default='./data/oxford-iiit-pet', help="Path to dataset root")
     parser.add_argument('--epochs', type=int, default=10, help="Number of training epochs")
     parser.add_argument('--batch_size', type=int, default=4, help="Batch size for training")
     parser.add_argument('--lr', type=float, default=1e-4, help="Learning rate")
