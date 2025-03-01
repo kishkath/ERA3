@@ -13,6 +13,8 @@ import albumentations as A
 from albumentations.pytorch import ToTensorV2
 from PIL import Image
 
+
+from utils import plot_imgs
 # Import our custom dataset, UNet model, and loss function helper.
 from dataset import CustomDataset
 from model import UNet
@@ -50,6 +52,12 @@ def main(args):
             'val': DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False, num_workers=4, pin_memory=True)
         }
         print(f"[INFO] Dataset ready: {len(train_dataset)} training samples, {len(val_dataset)} validation samples.")
+        
+        # ... After you have created train_dataset or a list of samples ...
+        # For example, to visualize the first 15 samples with both images and masks:
+        print(f"[INFO] Plotting Images: ")
+        plot_imgs(train_dataset, num_images=15, mode="both", save_path="train_samples.png")
+
     except Exception as e:
         print(f"[ERROR] Dataset preparation failed: {e}")
         return
