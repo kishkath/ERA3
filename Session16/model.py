@@ -168,7 +168,7 @@ class UNet(nn.Module):
         try:
             self.encoder = Encoder(in_channels=n_channels)
             self.decoder = Decoder(n_classes=n_classes)
-            print("UNet model initialized successfully.")
+            print("UNet model with [Maxpool(Compression) and Transpose convolution(Expansion)] were used and initialized successfully.")
         except Exception as e:
             print(f"Error initializing UNet: {e}")
             raise e
