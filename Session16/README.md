@@ -97,12 +97,32 @@ The main script (`main.py`) lets you choose the model architecture, loss functio
     - `--plot_mode`: (Optional) Visualization mode: `both`, `image`, or `mask`.
     - `--plot_save_path`: (Optional) File path to save the visualization figure.
 
-### Running on Kaggle
+### Running on Kaggle/Colab
 
 After placing all files in your Kaggle working directory (with proper folder structure), run the following one-liner in a Kaggle Notebook cell (adjust paths as needed):
 
 ```bash
-!python main.py --data_root "/kaggle/working/data/oxford-iiit-pet" --epochs 25 --batch_size 32 --lr 1e-4 --step_size 8 --gamma 0.1 --loss_type bce --model_type unet --checkpoint_path "checkpoint_unet.pth" --infer_image "/kaggle/working/data/oxford-iiit-pet/images/your_image.jpg" --plot_samples 15 --plot_mode both --plot_save_path "sample_visuals.png"
+from types import SimpleNamespace
+from main import main
+
+args = SimpleNamespace(
+    data_root="./data/oxford-iiit-pet",         # Dataset will be downloaded here.
+    epochs=10,                                 # Use a small number of epochs for testing.
+    batch_size=32,
+    lr=1e-4,
+    model_type="strided_upsample",             # Choose from "unet", "strided_transpose", or "strided_upsample"
+    step_size=8,
+    gamma=0.1,
+    bce_weight=0.5,
+    plot_samples=12,                           # Number of training samples to visualize.
+    plot_mode="both",                          # "both": display images and masks side by side.
+    loss_type="dice",                          # Choose "bce" or "dice"
+    checkpoint_path="/content/checkpoint.pth",
+    infer_image="/content/dog.jpg"             # Provide a valid path for inference.
+)
+
+main(args)
+
 ```
 
 Replace `"your_image.jpg"` with an actual filename if you want inference.
