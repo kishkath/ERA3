@@ -160,7 +160,7 @@ class UNet(nn.Module):
     Full UNet model using strided convolutions for downsampling and bilinear upsampling for upsampling.
     """
     def __init__(self, n_channels=3, n_classes=1):
-        super(StridedUNetUpsample, self).__init__()
+        super(UNet, self).__init__()
         try:
             self.encoder = StridedEncoder(in_channels=n_channels)
             self.decoder = DecoderUpsample(n_classes=n_classes)
