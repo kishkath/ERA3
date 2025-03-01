@@ -52,25 +52,40 @@ class StridedDown(nn.Module):
         return out
 
 class UpSample(nn.Module):
-    """Up-sampling block using bilinear upsampling, concatenation, then DoubleConv."""
+    """
+    Up-sampling block using bilinear upsampling followed by a 1x1 conv (to reduce channels),
+    concatenation with the skip connection, and then DoubleConv.
+    
+    After bilinear upsampling, the number of channels remains unchanged.
+    The 1x1 conv reduces the upsampled feature's channels to out_channels.
+    Then, concatenating with the skip (which should have out_channels),
+    the input to DoubleConv is 2*out_channels.
+    """
     def __init__(self, in_channels, out_channels):
+        """
+        Args:
+            in_channels: Number of channels of the feature to be upsampled (from the previous layer).
+            out_channels: Desired number of channels for the upsampled branch (and for the skip).
+        """
         super(UpSample, self).__init__()
         try:
             self.upsample = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
-            # After upsampling, channels remain the same; after concatenation: skip (out_channels) + upsampled (out_channels) = 2*out_channels.
-            self.conv = DoubleConv(in_channels, out_channels)
+            self.conv1x1 = nn.Conv2d(in_channels, out_channels, kernel_size=1)
+            # After concatenation, the number of channels becomes out_channels (from upsampled branch) + out_channels (skip)
+            self.conv = DoubleConv(2 * out_channels, out_channels)
         except Exception as e:
             print(f"Error initializing UpSample: {e}")
             raise e
 
     def forward(self, x1, x2):
         try:
-            x1 = self.upsample(x1)
+            x1 = self.upsample(x1)        # x1 retains its original channel count (in_channels)
+            x1 = self.conv1x1(x1)           # Now x1 has out_channels
             diffY = x2.size(2) - x1.size(2)
             diffX = x2.size(3) - x1.size(3)
             x1 = nn.functional.pad(x1, [diffX // 2, diffX - diffX // 2,
                                           diffY // 2, diffY - diffY // 2])
-            x = torch.cat([x2, x1], dim=1)
+            x = torch.cat([x2, x1], dim=1)  # x2 is the skip connection (should have out_channels)
             out = self.conv(x)
         except Exception as e:
             print(f"Error in UpSample forward pass: {e}")
@@ -127,11 +142,13 @@ class StridedEncoder(nn.Module):
 
 class DecoderUpsample(nn.Module):
     """
-    Decoder using UpSample blocks (bilinear upsampling).
+    Decoder using UpSample blocks (bilinear upsampling followed by 1x1 conv and DoubleConv).
     """
     def __init__(self, n_classes=1, features=[64, 128, 256, 512, 1024]):
         super(DecoderUpsample, self).__init__()
         try:
+            # For each upsample, the expected input: 
+            # For up1, x5 has channels = features[4], skip connection x4 has channels = features[3].
             self.up1 = UpSample(features[4], features[3])
             self.up2 = UpSample(features[3], features[2])
             self.up3 = UpSample(features[2], features[1])
