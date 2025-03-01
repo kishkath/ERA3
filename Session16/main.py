@@ -60,6 +60,7 @@ def main(args):
         print("[INFO] UNet model initialized.")
         # Display model summary using torchsummary if available.
         try:
+            print("[INFO] Getting model architecture")
             from torchsummary import summary
             summary(model, (3, 128, 128))
         except ImportError:
