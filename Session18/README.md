@@ -60,10 +60,13 @@ The project uses the **OpenAssistant Conversations (OASST1)** dataset, which was
 ## Deployment
 
 The final model is hosted on [[Hugging Face Spaces](https://huggingface.co/spaces/kishkath/phi2-qlora)
+
 ![Screenshot from 2025-03-12 22-39-30](https://github.com/user-attachments/assets/fc4ad336-f431-461d-9a8d-b9a27df18894)
+
+
 ![Screenshot from 2025-03-12 22-26-38](https://github.com/user-attachments/assets/1432eae7-2f2d-4bf3-846f-8b32fdc06600)
+
 ![Screenshot from 2025-03-12 22-26-24](https://github.com/user-attachments/assets/27eb8689-17b0-449a-8789-1ae252ac6fac)
-![Screenshot from 2025-03-11 15-29-23](https://github.com/user-attachments/assets/b2b52ee2-3d3f-45bf-84e3-cec8d632b5ff)
 ](#) and is optimized for efficient CPU-based inference. This makes it accessible to everyone without the need for specialized hardware. Continuous improvements are planned to further boost inference speed and overall performance.
 
 ---
