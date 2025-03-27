@@ -1,4 +1,4 @@
-# Reinforcement learning Part1: GridWorld Value Iteration Assignment
+# Reinforcement learning Part-1: GridWorld Value Iteration Assignment
 
 This project demonstrates a simple reinforcement learning problem using a 4x4 GridWorld and the value iteration algorithm to compute optimal state values.
 
