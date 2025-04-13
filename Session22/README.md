@@ -1,4 +1,4 @@
-**Phi-2 Fine‑Tuning & qLoRA Compression Demo**
+**Phi-2 Fine‑Tuning & qLoRA Compression with GRPO-Trainer**
 
 This repository demonstrates the conceptual process of fine‑tuning the Phi‑2 (un‑SFTed) language model using the GRPO Trainer from Hugging Face, compressing the resulting model with qLoRA, and deploying a live inference demo on Hugging Face Spaces.
 
