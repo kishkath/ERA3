@@ -75,10 +75,9 @@ The qLoRA‑compressed model is integrated into a Gradio app that allows users t
 
 ## 📖 Recalculated Responses Demo
 
-The base model response:
+Responses: Base Model (left)  & Finetuned model with GRPOTrainer (right(
 
-
-The finetuned (GRPO) model response:
+![image](https://github.com/user-attachments/assets/551eba74-346c-49e3-bf94-dfe347e20d5a)
 
 
 This showcases the effectiveness of GRPO training combined with qLoRA compression.
