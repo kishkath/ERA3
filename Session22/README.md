@@ -13,11 +13,10 @@ This repository demonstrates the conceptual process of fine‑tuning the Phi‑2
    - After training, the model is compressed using qLoRA, enabling efficient deployment and inference.
 
 3. **Deploy on Hugging Face Spaces**
-   - The compressed model is wrapped in a Gradio application and deployed as a live demo on Hugging Face Spaces.
+   - The compressed model is wrapped in a Gradio application and deployed as a live demo on Hugging Face Spaces. (Running on CPU)
 
 4. **Repository & Demo Links**
-   - **Spaces Demo**: [Your Space Link Here]
-   - **GitHub Repo**: [Your GitHub Link Here]
+   - **Spaces Demo**: [https://huggingface.co/spaces/kishkath/phi2-grpo-qlora]
 
 ---
 
@@ -63,7 +62,7 @@ GRPO (Guided Reinforcement Policy Optimization) is a method that merges reinforc
 qLoRA (quantized Low-Rank Adaptation) is an optimization technique for compressing large language models by combining quantization and parameter-efficient fine-tuning.
 
 **Benefits:**
-- **Reduced Memory Usage:** Achieves 4‑bit or 8‑bit precision while maintaining accuracy.
+- **Reduced Memory Usage:** Achieves 4‑bit precision while maintaining accuracy.
 - **Faster Inference:** Lower memory consumption translates to faster predictions.
 - **Efficient Deployment:** Ideal for deploying models on resource-constrained environments like Hugging Face Spaces.
 
@@ -79,10 +78,11 @@ The qLoRA‑compressed model is integrated into a Gradio app that allows users t
 
 ## 📖 Recalculated Responses Demo
 
-The deployed app features dynamic recalculation of responses. Every interaction generates fresh output from the fine‑tuned and compressed model, allowing real-time observation of:
-- Token usage
-- Latency
-- Model output fidelity
+The base model response:
+
+
+The finetuned (GRPO) model response:
+
 
 This showcases the effectiveness of GRPO training combined with qLoRA compression.
 
@@ -96,5 +96,4 @@ This showcases the effectiveness of GRPO training combined with qLoRA compressio
 
 ## 📜 License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
-
+This project is licensed under the Educational Purposes.
