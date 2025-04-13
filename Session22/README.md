@@ -22,10 +22,7 @@ This repository demonstrates the conceptual process of fine‑tuning the Phi‑2
 
 ## 📦 Repository Structure (Conceptual)
 
-- **data/**: Contains the dataset used for fine‑tuning.
-- **grpo_training/**: Contains fine‑tuning logic using the GRPO Trainer.
-- **quantization/**: Details the qLoRA compression process.
-- **app/**: Hosts the Gradio-based web demo for the model.
+- **grpotrainer_colab_trained_40steps**: Notebook with the code where the phi-2 model finetuned with [Open](https://huggingface.co/datasets/OpenAssistant/oasst1) with Q-lora and GRPO Trainer
 - **README.md**: Provides theoretical overview and project documentation.
 
 ---
