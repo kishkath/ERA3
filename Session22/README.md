@@ -90,8 +90,7 @@ This showcases the effectiveness of GRPO training combined with qLoRA compressio
 
 ## 🔗 Links
 
-- **Hugging Face Space:** https://huggingface.co/spaces/<your-username>/phi2-grpo-qLoRA-demo
-- **GitHub Repository:** https://github.com/<your-username>/phi2-grpo-qLoRA-demo
+- **Hugging Face Space:** [https://huggingface.co/spaces/<your-username>/phi2-grpo-qLoRA-demo](https://huggingface.co/spaces/kishkath/phi2-grpo-qlora)
 
 ---
 
