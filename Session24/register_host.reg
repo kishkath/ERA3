@@ -1,0 +1,4 @@
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Google\Chrome\NativeMessagingHosts\com.resume_evaluator.host]
+@="C:\\Users\\saikir\\learnings\\sessi24\\resume_evaluator_host.json" 

@@ -1,0 +1,9 @@
+{
+  "name": "com.resume_evaluator.host",
+  "description": "Resume Evaluator Native Messaging Host",
+  "path": "resume_evaluator_host.py",
+  "type": "stdio",
+  "allowed_origins": [
+    "chrome-extension://[YOUR_EXTENSION_ID]/"
+  ]
+} 

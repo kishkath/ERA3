@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Resume Evaluator",
+  "version": "1.0",
+  "description": "AI-powered resume evaluation tool",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+} 

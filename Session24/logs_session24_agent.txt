@@ -1,0 +1,5 @@
+[Background] Received message: evaluateResume
+background.js:26 [Background] Processing file: nu_saikiran.pdf Type: application/pdf Size: 47116
+background.js:38 [Background] Starting evaluation process...
+background.js:43 [Background] Generated score: 46
+background.js:50 [Background] Sending response: Object
