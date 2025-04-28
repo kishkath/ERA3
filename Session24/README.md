@@ -2,6 +2,8 @@
 
 An AI-powered Chrome extension that evaluates resumes against job descriptions using Google's Gemini AI. The extension provides instant feedback on how well a resume matches specific job requirements.
 
+YOUTUBE LINK: https://youtu.be/4f2jlC-9eKw?si=guRPhM73C14TzNJ3
+
 ## Features
 
 - **File Upload**: Supports PDF and Word document formats
