@@ -108,21 +108,20 @@ The full automation works as follows:
 
 The LLM is prompted to control tools using structured function calls like:
 
-```
+         ```
+         
+         FUNCTION\_CALL: open\_paint
 
-FUNCTION\_CALL: open\_paint
-
-# # Wait longer for Paint to be fully maximized
-
-# await asyncio.sleep(1)
-
-FUNCTION\_CALL: draw\_rectangle|780|380|1140|700
-FUNCTION\_CALL: add\_text\_in\_paint|1111
-FUNCTION\_CALL: save\_paint\_image
-FUNCTION\_CALL: send\_email\_with\_image|[me@example.com](mailto:me@example.com)
-BREAK
-
-```
+         FUNCTION\_CALL: draw\_rectangle|780|380|1140|700
+         
+         FUNCTION\_CALL: add\_text\_in\_paint|1111
+         
+         FUNCTION\_CALL: save\_paint\_image
+         
+         FUNCTION\_CALL: send\_email\_with\_image|[me@example.com](mailto:me@example.com)
+         BREAK
+         
+         ```
 
 ## 🔧 Available Tools
 
