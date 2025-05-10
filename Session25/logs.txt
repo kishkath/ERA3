@@ -1,340 +1,176 @@
-import os
-from dotenv import load_dotenv
-from mcp import ClientSession, StdioServerParameters, types
-from mcp.client.stdio import stdio_client
-import asyncio
-from google import genai
-from concurrent.futures import TimeoutError
-from functools import partial
+Starting main execution...
+Establishing connection to MCP server...
+Connection established, creating session...
+Session created, initializing...
+Requesting tool list...
+Successfully retrieved 24 tools
+Creating system prompt...
+Number of tools: 24
+Added description for tool: 1. add(a: integer, b: integer) - Add two numbers
+Added description for tool: 2. add_list(l: array) - Add all numbers in a list
+Added description for tool: 3. subtract(a: integer, b: integer) - Subtract two numbers
+Added description for tool: 4. multiply(a: integer, b: integer) - Multiply two numbers
+Added description for tool: 5. divide(a: integer, b: integer) - Divide two numbers
+Added description for tool: 6. power(a: integer, b: integer) - Power of two numbers
+Added description for tool: 7. sqrt(a: integer) - Square root of a number
+Added description for tool: 8. cbrt(a: integer) - Cube root of a number
+Added description for tool: 9. factorial(a: integer) - factorial of a number
+Added description for tool: 10. log(a: integer) - log of a number
+Added description for tool: 11. remainder(a: integer, b: integer) - remainder of two numbers divison
+Added description for tool: 12. sin(a: integer) - sin of a number
+Added description for tool: 13. cos(a: integer) - cos of a number
+Added description for tool: 14. tan(a: integer) - tan of a number
+Added description for tool: 15. mine(a: integer, b: integer) - special mining tool
+Added description for tool: 16. create_thumbnail(image_path: string) - Create a thumbnail from an image
+Added description for tool: 17. strings_to_chars_to_int(string: string) - Return the ASCII values of the characters in a word
+Added description for tool: 18. int_list_to_exponential_sum(int_list: array) - Return sum of exponentials of numbers in a list
+Added description for tool: 19. fibonacci_numbers(n: integer) - Return the first n Fibonacci Numbers
+Added description for tool: 20. draw_rectangle(x1: integer, y1: integer, x2: integer, y2: integer) - Draw a rectangle in Paint from (x1,y1) to (x2,y2)
+Added description for tool: 21. add_text_in_paint(text: string) - Add text in Paint
+Added description for tool: 22. save_paint_image() - Automatically save the current Paint drawing as 'output.png' in the current directory (overwrite if needed)
+Added description for tool: 23. open_paint() - Open Microsoft Paint maximized on secondary monitor
+Added description for tool: 24. send_paint_image_via_email() - Send the saved Paint image via Gmail as an attachment
+Successfully created tools description
+Created system prompt...
+Starting iteration loop...
 
-# Load environment variables from .env file
-load_dotenv()
+--- Iteration 1 ---
+Preparing to generate LLM response...
+Starting LLM generation...
+LLM generation completed
+LLM Response: FUNCTION_CALL: strings_to_chars_to_int|INDIA
+>>parts:  ['strings_to_chars_to_int', 'INDIA']
 
-# Access your API key and initialize Gemini client correctly
-api_key = os.getenv("GEMINI_API_KEY")
-client = genai.Client(api_key=api_key)
+DEBUG: Raw function info:  strings_to_chars_to_int|INDIA
+DEBUG: Split parts: ['strings_to_chars_to_int', 'INDIA']
+DEBUG: Function name: strings_to_chars_to_int
+DEBUG: Raw parameters: ['INDIA']
+DEBUG: Found tool: strings_to_chars_to_int
+DEBUG: Tool schema: {'properties': {'string': {'title': 'String', 'type': 'string'}}, 'required': ['string'], 'title': 'strings_to_chars_to_intArguments', 'type': 'object'}
+DEBUG: Schema properties: {'string': {'title': 'String', 'type': 'string'}}
+DEBUG: Converting parameter string with value INDIA to type string
+DEBUG: Final arguments: {'string': 'INDIA'}
+DEBUG: Calling tool strings_to_chars_to_int
+DEBUG: Raw result: meta=None content=[TextContent(type='text', text='73', annotations=None), TextContent(type='text', text='78', annotations=None), TextContent(type='text', text='68', annotations=None), TextContent(type='text', text='73', annotations=None), TextContent(type='text', text='65', annotations=None)] isError=False
+DEBUG: Result has content attribute
+DEBUG: Final iteration result: ['73', '78', '68', '73', '65']
 
-max_iterations = 3
-last_response = None
-iteration = 0
-iteration_response = []
+--- Iteration 2 ---
+Preparing to generate LLM response...
+Starting LLM generation...
+LLM generation completed
+LLM Response: FUNCTION_CALL: int_list_to_exponential_sum|[73, 78, 68, 73, 65]
+>>parts:  ['int_list_to_exponential_sum', '[73, 78, 68, 73, 65]']
 
+DEBUG: Raw function info:  int_list_to_exponential_sum|[73, 78, 68, 73, 65]
+DEBUG: Split parts: ['int_list_to_exponential_sum', '[73, 78, 68, 73, 65]']
+DEBUG: Function name: int_list_to_exponential_sum
+DEBUG: Raw parameters: ['[73, 78, 68, 73, 65]']
+DEBUG: Found tool: int_list_to_exponential_sum
+DEBUG: Tool schema: {'properties': {'int_list': {'items': {}, 'title': 'Int List', 'type': 'array'}}, 'required': ['int_list'], 'title': 'int_list_to_exponential_sumArguments', 'type': 'object'}
+DEBUG: Schema properties: {'int_list': {'items': {}, 'title': 'Int List', 'type': 'array'}}
+DEBUG: Converting parameter int_list with value [73, 78, 68, 73, 65] to type array
+DEBUG: Final arguments: {'int_list': [73, 78, 68, 73, 65]}
+DEBUG: Calling tool int_list_to_exponential_sum
+DEBUG: Raw result: meta=None content=[TextContent(type='text', text='7.59982224609308e+33', annotations=None)] isError=False
+DEBUG: Result has content attribute
+DEBUG: Final iteration result: ['7.59982224609308e+33']
 
-async def generate_with_timeout(client, prompt, timeout=10):
-    """Generate content with a timeout"""
-    print("Starting LLM generation...")
-    try:
-        # Convert the synchronous generate_content call to run in a thread
-        loop = asyncio.get_event_loop()
-        response = await asyncio.wait_for(
-            loop.run_in_executor(
-                None,
-                lambda: client.models.generate_content(
-                    model="gemini-2.0-flash",
-                    contents=prompt
-                )
-            ),
-            timeout=timeout
-        )
-        print("LLM generation completed")
-        return response
-    except TimeoutError:
-        print("LLM generation timed out!")
-        raise
-    except Exception as e:
-        print(f"Error in LLM generation: {e}")
-        raise
+--- Iteration 3 ---
+Preparing to generate LLM response...
+Starting LLM generation...
+LLM generation completed
+LLM Response: FINAL_ANSWER: [7.59982224609308e+33]
 
+=== Agent Execution Complete ===
+Preparing to generate LLM response...
+Starting LLM generation...
+LLM generation completed
+LLM Response: FUNCTION_CALL: open_paint
+# # Wait longer for Paint to be fully maximized
+# await asyncio.sleep(1)
+FUNCTION_CALL: draw_rectangle|780|380|1140|700
+FUNCTION_CALL: add_text_in_paint|1111
+FUNCTION_CALL: save_paint_image|None
+# await asyncio.sleep(2)
+FUNCTION_CALL: send_paint_image_via_email|None
+BREAK
+>> flowing response:  FUNCTION_CALL: open_paint
 
-def reset_state():
-    """Reset all global variables to their initial state"""
-    global last_response, iteration, iteration_response
-    last_response = None
-    iteration = 0
-    iteration_response = []
+DEBUG: Raw function info:  open_paint
+DEBUG: Split parts: ['open_paint']
+DEBUG: Function name: open_paint
+DEBUG: Raw parameters: []
+DEBUG: Found tool: open_paint
+DEBUG: Tool schema: {'properties': {}, 'title': 'open_paintArguments', 'type': 'object'}
+DEBUG: Schema properties: {}
+DEBUG: Final arguments: {}
+DEBUG: Calling tool open_paint
+DEBUG: Raw result: meta=None content=[TextContent(type='text', text='{"content": [{"type": "text", "text": "Paint opened successfully on secondary monitor and maximized", "annotations": null}]}', annotations=None)] isError=False
+DEBUG: Result has content attribute
+DEBUG: Final iteration result: ['{"content": [{"type": "text", "text": "Paint opened successfully on secondary monitor and maximized", "annotations": null}]}']
+>> flowing response:  # # Wait longer for Paint to be fully maximized
+>> flowing response:  # await asyncio.sleep(1)
+>> flowing response:  FUNCTION_CALL: draw_rectangle|780|380|1140|700
 
+DEBUG: Raw function info:  draw_rectangle|780|380|1140|700
+DEBUG: Split parts: ['draw_rectangle', '780', '380', '1140', '700']
+DEBUG: Function name: draw_rectangle
+DEBUG: Raw parameters: ['780', '380', '1140', '700']
+DEBUG: Found tool: draw_rectangle
+DEBUG: Tool schema: {'properties': {'x1': {'title': 'X1', 'type': 'integer'}, 'y1': {'title': 'Y1', 'type': 'integer'}, 'x2': {'title': 'X2', 'type': 'integer'}, 'y2': {'title': 'Y2', 'type': 'integer'}}, 'required': ['x1', 'y1', 'x2', 'y2'], 'title': 'draw_rectangleArguments', 'type': 'object'}
+DEBUG: Schema properties: {'x1': {'title': 'X1', 'type': 'integer'}, 'y1': {'title': 'Y1', 'type': 'integer'}, 'x2': {'title': 'X2', 'type': 'integer'}, 'y2': {'title': 'Y2', 'type': 'integer'}}
+DEBUG: Converting parameter x1 with value 780 to type integer
+DEBUG: Converting parameter y1 with value 380 to type integer
+DEBUG: Converting parameter x2 with value 1140 to type integer
+DEBUG: Converting parameter y2 with value 700 to type integer
+DEBUG: Final arguments: {'x1': 780, 'y1': 380, 'x2': 1140, 'y2': 700}
+DEBUG: Calling tool draw_rectangle
+DEBUG: Raw result: meta=None content=[TextContent(type='text', text='{"content": [{"type": "text", "text": "Rectangle drawn from (780,380) to (1140,700)", "annotations": null}]}', annotations=None)] isError=False
+DEBUG: Result has content attribute
+DEBUG: Final iteration result: ['{"content": [{"type": "text", "text": "Rectangle drawn from (780,380) to (1140,700)", "annotations": null}]}']
+>> flowing response:  FUNCTION_CALL: add_text_in_paint|1111
 
-async def main():
-    reset_state()  # Reset at the start of main
-    print("Starting main execution...")
-    try:
-        # Create a single MCP server connection
-        print("Establishing connection to MCP server...")
-        server_params = StdioServerParameters(
-            command="python",
-            args=["assignment_example2_server.py"]
-        )
+DEBUG: Raw function info:  add_text_in_paint|1111
+DEBUG: Split parts: ['add_text_in_paint', '1111']
+DEBUG: Function name: add_text_in_paint
+DEBUG: Raw parameters: ['1111']
+DEBUG: Found tool: add_text_in_paint
+DEBUG: Tool schema: {'properties': {'text': {'title': 'Text', 'type': 'string'}}, 'required': ['text'], 'title': 'add_text_in_paintArguments', 'type': 'object'}
+DEBUG: Schema properties: {'text': {'title': 'Text', 'type': 'string'}}
+DEBUG: Converting parameter text with value 1111 to type string
+DEBUG: Final arguments: {'text': '1111'}
+DEBUG: Calling tool add_text_in_paint
+DEBUG: Raw result: meta=None content=[TextContent(type='text', text='{"content": [{"type": "text", "text": "Text:\'1111\' added successfully", "annotations": null}]}', annotations=None)] isError=False
+DEBUG: Result has content attribute
+DEBUG: Final iteration result: ['{"content": [{"type": "text", "text": "Text:\'1111\' added successfully", "annotations": null}]}']
+>> flowing response:  FUNCTION_CALL: save_paint_image|None
 
-        async with stdio_client(server_params) as (read, write):
-            print("Connection established, creating session...")
-            async with ClientSession(read, write) as session:
-                print("Session created, initializing...")
-                await session.initialize()
+DEBUG: Raw function info:  save_paint_image|None
+DEBUG: Split parts: ['save_paint_image', 'None']
+DEBUG: Function name: save_paint_image
+DEBUG: Raw parameters: ['None']
+DEBUG: Found tool: save_paint_image
+DEBUG: Tool schema: {'properties': {}, 'title': 'save_paint_imageArguments', 'type': 'object'}
+DEBUG: Schema properties: {}
+DEBUG: Final arguments: {}
+DEBUG: Calling tool save_paint_image
+DEBUG: Raw result: meta=None content=[TextContent(type='text', text='{"content": [{"type": "text", "text": "Error saving Paint image: type object \'Image\' has no attribute \'frombytes\'", "annotations": null}]}', annotations=None)] isError=False
+DEBUG: Result has content attribute
+DEBUG: Final iteration result: ['{"content": [{"type": "text", "text": "Error saving Paint image: type object \'Image\' has no attribute \'frombytes\'", "annotations": null}]}']
+>> flowing response:  # await asyncio.sleep(2)
+>> flowing response:  FUNCTION_CALL: send_paint_image_via_email|None
 
-                # Get available tools
-                print("Requesting tool list...")
-                tools_result = await session.list_tools()
-                tools = tools_result.tools
-                print(f"Successfully retrieved {len(tools)} tools")
-
-                # Create system prompt with available tools
-                print("Creating system prompt...")
-                print(f"Number of tools: {len(tools)}")
-
-                try:
-                    # First, let's inspect what a tool object looks like
-                    # if tools:
-                    #     print(f"First tool properties: {dir(tools[0])}")
-                    #     print(f"First tool example: {tools[0]}")
-
-                    tools_description = []
-                    for i, tool in enumerate(tools):
-                        try:
-                            # Get tool properties
-                            params = tool.inputSchema
-                            desc = getattr(tool, 'description', 'No description available')
-                            name = getattr(tool, 'name', f'tool_{i}')
-
-                            # Format the input schema in a more readable way
-                            if 'properties' in params:
-                                param_details = []
-                                for param_name, param_info in params['properties'].items():
-                                    param_type = param_info.get('type', 'unknown')
-                                    param_details.append(f"{param_name}: {param_type}")
-                                params_str = ', '.join(param_details)
-                            else:
-                                params_str = 'no parameters'
-
-                            tool_desc = f"{i + 1}. {name}({params_str}) - {desc}"
-                            tools_description.append(tool_desc)
-                            print(f"Added description for tool: {tool_desc}")
-                        except Exception as e:
-                            print(f"Error processing tool {i}: {e}")
-                            tools_description.append(f"{i + 1}. Error processing tool")
-
-                    tools_description = "\n".join(tools_description)
-                    print("Successfully created tools description", tools_description)
-                except Exception as e:
-                    print(f"Error creating tools description: {e}")
-                    tools_description = "Error loading tools"
-
-                print("Created system prompt...")
-                system_prompt = f"""You are a math agent solving problems in iterations and also a UI agent (You can open the machines applications via tools). You have access to various mathematical tools.
-
-                Available tools:
-                {tools_description}
-
-                Instructions:
-
-                * Perform the requested calculations step by step using function calls.
-                * When all required calculations are complete, return the FINAL_ANSWER.
-                * After giving FINAL_ANSWER:
-                  - Open the paint application using FUNCTION_CALL: open_paint
-                  - Wait 1 second before drawing (Paint must fully load) → await asyncio.sleep(1)
-                  - Then draw a small rectangle using FUNCTION_CALL: draw_rectangle|x1|y1|x2|y2
-                  - Insert the number "111" inside the rectangle using FUNCTION_CALL: insert_text|x|y|111
-                * Do not repeat function calls with the same parameters.
-
-                Valid Response Formats (EXACTLY ONE line, NO extra text or explanations):
-                The response must be provided as:
-
-                1. FUNCTION_CALL: function_name|param1|param2|...
-                2. FINAL_ANSWER: [number]
-
-                3. FUNCTION_CALL: open_paint
-                4. FUNCTION_CALL: draw_rectangle|x1|y1|x2|y2
-                5. FUNCTION_CALL: add_text_in_paint|x|y|111
-
-                Examples:
-
-                * FUNCTION_CALL: add|5|3
-                * FUNCTION_CALL: strings_to_chars_to_int|INDIA
-                * FINAL_ANSWER: [42]
-                * FUNCTION_CALL: open_paint
-                * FUNCTION_CALL: draw_rectangle|100|100|50|50
-                * FUNCTION_CALL: add_text_in_paint|20|20|111
-
-                IMPORTANT:
-
-                * Your entire response must be a single line in the formats above.
-                * No natural language or explanation is allowed.
-                * Rectangle can be small and square (e.g., 100x100 to 50x50 coordinates)
-                """
-
-                query = """Find the ASCII values of characters in INDIA and then find out the sum of exponentials of those values. After the final answer is calculated, open the paint application and draw a small square (rectangle with equal sides) on the paintboard and write 111 inside it."""
-                print("Starting iteration loop...")
-
-                # Use global iteration variables
-                global iteration, last_response
-
-                while iteration < max_iterations:
-                    print(f"\n--- Iteration {iteration + 1} ---")
-                    if last_response is None:
-                        current_query = query
-                    else:
-                        current_query = current_query + "\n\n" + " ".join(iteration_response)
-                        current_query = current_query + "  What should I do next?"
-
-                    # Get model's response with timeout
-                    print("Preparing to generate LLM response...")
-                    prompt = f"{system_prompt}\n\nQuery: {current_query}"
-                    try:
-                        response = await generate_with_timeout(client, prompt)
-                        response_text = response.text.strip()
-                        print(f"LLM Response: {response_text}")
-
-                        # Find the FUNCTION_CALL line in the response
-                        for line in response_text.split('\n'):
-                            line = line.strip()
-                            if line.startswith("FUNCTION_CALL:"):
-                                response_text = line
-                                break
-                            elif line.startswith("FINAL_ANSWER:"):
-                                response_text = line
-                                break
-
-                    except Exception as e:
-                        print(f"Failed to get LLM response: {e}")
-                        break
-
-
-                    _, function_info = response_text.split(":", 1)
-
-                    parts = [p.strip() for p in function_info.split("|")]
-                    func_name, params = parts[0], parts[1:]
-
-                    print(">>>PARTS:", parts, func_name)
-
-                    print(f"\nDEBUG: Raw function info: {function_info}")
-                    print(f"DEBUG: Split parts: {parts}")
-                    print(f"DEBUG: Function name: {func_name}")
-                    print(f"DEBUG: Raw parameters: {params}")
-
-                    try:
-                        # Find the matching tool to get its input schema
-                        tool = next((t for t in tools if t.name == func_name), None)
-                        if not tool:
-                            print(f"DEBUG: Available tools: {[t.name for t in tools]}")
-                            raise ValueError(f"Unknown tool: {func_name}")
-
-                        print(f"DEBUG: Found tool: {tool.name}")
-                        print(f"DEBUG: Tool schema: {tool.inputSchema}")
-
-                        # Prepare arguments according to the tool's input schema
-                        arguments = {}
-                        schema_properties = tool.inputSchema.get('properties', {})
-                        print(f"DEBUG: Schema properties: {schema_properties}")
-
-                        for param_name, param_info in schema_properties.items():
-                            if not params:  # Check if we have enough parameters
-                                raise ValueError(f"Not enough parameters provided for {func_name}")
-
-                            value = params.pop(0)  # Get and remove the first parameter
-                            param_type = param_info.get('type', 'string')
-
-                            print(
-                                f"DEBUG: Converting parameter {param_name} with value {value} to type {param_type}")
-
-                            # Convert the value to the correct type based on the schema
-                            if param_type == 'integer':
-                                arguments[param_name] = int(value)
-                            elif param_type == 'number':
-                                arguments[param_name] = float(value)
-                            elif param_type == 'array':
-                                # Handle array input
-                                if isinstance(value, str):
-                                    value = value.strip('[]').split(',')
-                                arguments[param_name] = [int(x.strip()) for x in value]
-                            else:
-                                arguments[param_name] = str(value)
-
-                        print(f"DEBUG: Final arguments: {arguments}")
-                        print(f"DEBUG: Calling tool {func_name}")
-
-                        result = await session.call_tool(func_name, arguments=arguments)
-                        print(f"DEBUG: Raw result: {result}")
-
-                        # Get the full result content
-                        if hasattr(result, 'content'):
-                            print(f"DEBUG: Result has content attribute")
-                            # Handle multiple content items
-                            if isinstance(result.content, list):
-                                iteration_result = [
-                                    item.text if hasattr(item, 'text') else str(item)
-                                    for item in result.content
-                                ]
-                            else:
-                                iteration_result = str(result.content)
-                        else:
-                            print(f"DEBUG: Result has no content attribute")
-                            iteration_result = str(result)
-
-                        print(f"DEBUG: Final iteration result: {iteration_result}")
-
-                        # Format the response based on result type
-                        if isinstance(iteration_result, list):
-                            result_str = f"[{', '.join(iteration_result)}]"
-                        else:
-                            result_str = str(iteration_result)
-
-                        iteration_response.append(
-                            f"In the {iteration + 1} iteration you called {func_name} with {arguments} parameters, "
-                            f"and the function returned {result_str}."
-                        )
-                        last_response = iteration_result
-
-                    except Exception as e:
-                        print(f"DEBUG: Error details: {str(e)}")
-                        print(f"DEBUG: Error type: {type(e)}")
-                        import traceback
-                        traceback.print_exc()
-                        iteration_response.append(f"Error in iteration {iteration + 1}: {str(e)}")
-                        break
-
-
-                    if response_text.startswith("FINAL_ANSWER"):
-                        break
-
-
-                    # elif response_text.startswith("FINAL_ANSWER:"):
-                    #     print("\n=== Agent Execution Complete ===")
-                    #     result = await session.call_tool("open_paint")
-                    #     print(result.content[0].text)
-                    #     # Wait longer for Paint to be fully maximized
-                    #     await asyncio.sleep(1)
-                    #
-                    #     # Draw a rectangle
-                    #     result = await session.call_tool(
-                    #         "draw_rectangle",
-                    #         arguments={
-                    #             "x1": 780,
-                    #             "y1": 380,
-                    #             "x2": 1140,
-                    #             "y2": 700
-                    #         }
-                    #
-                    #     )
-                    #     print(result.content[0].text)
-                    #
-                    #     # Draw rectangle and add text
-                    #     result = await session.call_tool(
-                    #         "add_text_in_paint",
-                    #         arguments={
-                    #             "text": response_text
-                    #         }
-                    #     )
-                    #     print(result.content[0].text)
-                    #     break
-
-                    iteration += 1
-
-    except Exception as e:
-        print(f"Error in main execution: {e}")
-        import traceback
-        traceback.print_exc()
-    finally:
-        reset_state()  # Reset at the end of main
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
+DEBUG: Raw function info:  send_paint_image_via_email|None
+DEBUG: Split parts: ['send_paint_image_via_email', 'None']
+DEBUG: Function name: send_paint_image_via_email
+DEBUG: Raw parameters: ['None']
+DEBUG: Found tool: send_paint_image_via_email
+DEBUG: Tool schema: {'properties': {}, 'title': 'send_paint_image_via_emailArguments', 'type': 'object'}
+DEBUG: Schema properties: {}
+DEBUG: Final arguments: {}
+DEBUG: Calling tool send_paint_image_via_email
+DEBUG: Raw result: meta=None content=[TextContent(type='text', text='{"content": [{"type": "text", "text": "Email sent successfully to usedforuda@gmail.com.", "annotations": null}]}', annotations=None)] isError=False
+DEBUG: Result has content attribute
+DEBUG: Final iteration result: ['{"content": [{"type": "text", "text": "Email sent successfully to usedforuda@gmail.com.", "annotations": null}]}']
+>> flowing response:  BREAK
