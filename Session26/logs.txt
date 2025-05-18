@@ -1,0 +1,78 @@
+INFO:__main__:Generated new Flask secret key
+INFO:utils:Loaded embedding model from cache
+INFO:embedding_service:Loaded embedding model from cache
+INFO:embedding_service:Initialized FAISS index with 100 embeddings
+Credentials structure: {}
+Successfully updated .env file with Google credentials
+INFO:__main__:Starting Flask application
+ * Serving Flask app 'app'
+ * Debug mode: on
+INFO:werkzeug:WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:5000
+INFO:werkzeug:Press CTRL+C to quit
+INFO:werkzeug: * Restarting with stat
+INFO:__main__:Generated new Flask secret key
+INFO:utils:Loaded embedding model from cache
+INFO:embedding_service:Loaded embedding model from cache
+INFO:embedding_service:Initialized FAISS index with 100 embeddings
+Credentials structure: {}
+Successfully updated .env file with Google credentials
+INFO:__main__:Starting Flask application
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 760-784-960
+INFO:__main__:User not authenticated, redirecting to authorization
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 17:27:33] "GET / HTTP/1.1" 302 -
+INFO:__main__:Starting OAuth2 authorization flow
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 17:27:33] "GET /authorize HTTP/1.1" 302 -
+INFO:__main__:User not authenticated, redirecting to authorization
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 17:28:05] "GET / HTTP/1.1" 302 -
+INFO:__main__:Starting OAuth2 authorization flow
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 17:28:05] "GET /authorize HTTP/1.1" 302 -
+INFO:__main__:OAuth2 authentication completed successfully
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 17:28:40] "GET /oauth2callback?state=ZXduaLgBiGoUTfi9DDiEyV4EpzFov0&code=4/0AUJR-x7Y4zH_GAQjFU-OQfdKQ1ld70ZqQRd1dpu5vNvjotSGJg9XO-Otk6mAtOUbpDYplw&scope=https://www.googleapis.com/auth/gmail.readonly HTTP/1.1" 302 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 17:28:41] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 17:28:41] "GET /check-auth HTTP/1.1" 200 -
+INFO:__main__:Fetching new emails from Gmail
+INFO:googleapiclient.discovery_cache:file_cache is only supported with oauth2client<4.0.0
+INFO:gmail_service:Retrieved 100 emails from Gmail
+INFO:__main__:Updating database with 100 emails
+INFO:embedding_service:Initialized FAISS index with 100 embeddings
+INFO:embedding_service:Updated embeddings for 100 emails
+INFO:__main__:Database update completed
+INFO:__main__:Searching emails with FAISS
+INFO:embedding_service:Found 3 similar emails
+INFO:__main__:Found 3 similar emails
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 17:30:18] "POST /search HTTP/1.1" 200 -
+INFO:__main__:Searching emails with FAISS
+INFO:embedding_service:Found 3 similar emails
+INFO:__main__:Found 3 similar emails
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 17:31:25] "POST /search HTTP/1.1" 200 -
+INFO:__main__:Searching emails with FAISS
+INFO:embedding_service:Found 3 similar emails
+INFO:__main__:Found 3 similar emails
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 17:31:33] "POST /search HTTP/1.1" 200 -
+INFO:__main__:Searching emails with FAISS
+INFO:embedding_service:Found 3 similar emails
+INFO:__main__:Found 3 similar emails
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 17:31:40] "POST /search HTTP/1.1" 200 -
+INFO:__main__:Searching emails with FAISS
+INFO:embedding_service:Found 3 similar emails
+INFO:__main__:Found 3 similar emails
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 17:32:04] "POST /search HTTP/1.1" 200 -
+INFO:__main__:Searching emails with FAISS
+INFO:embedding_service:Found 5 similar emails
+INFO:__main__:Found 5 similar emails
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 17:32:12] "POST /search HTTP/1.1" 200 -
+INFO:__main__:Searching emails with FAISS
+INFO:embedding_service:Found 5 similar emails
+INFO:__main__:Found 5 similar emails
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 17:32:23] "POST /search HTTP/1.1" 200 -
+INFO:__main__:Searching emails with FAISS
+INFO:embedding_service:Found 3 similar emails
+INFO:__main__:Found 3 similar emails
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 17:32:35] "POST /search HTTP/1.1" 200 -
+INFO:__main__:Searching emails with FAISS
+INFO:embedding_service:Found 3 similar emails
+INFO:__main__:Found 3 similar emails
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 17:33:56] "POST /search HTTP/1.1" 200 -
+

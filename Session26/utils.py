@@ -1,9 +1,13 @@
 import json
 import os
 import pickle
+import logging
 from dotenv import load_dotenv
 from datetime import datetime
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 def get_google_credentials():
     """
@@ -85,45 +89,58 @@ def get_google_credentials():
 
 # Cache management functions
 def ensure_cache_dir():
-    """Ensure the cache directory exists"""
+    """Ensure cache directory exists"""
     cache_dir = os.path.join(os.path.dirname(__file__), 'cache')
     if not os.path.exists(cache_dir):
         os.makedirs(cache_dir)
     return cache_dir
 
-def get_cache_path(service_name, cache_type):
-    """Get the path for a specific cache file"""
+def get_cache_path(category, key):
+    """Get cache file path"""
     cache_dir = ensure_cache_dir()
-    return os.path.join(cache_dir, f'{service_name}_{cache_type}.pkl')
+    return os.path.join(cache_dir, f"{category}_{key}.pkl")
 
-def save_to_cache(data, service_name, cache_type):
-    """Save data to cache"""
-    cache_path = get_cache_path(service_name, cache_type)
-    with open(cache_path, 'wb') as f:
-        pickle.dump({
-            'timestamp': datetime.now(),
-            'data': data
-        }, f)
-
-def load_from_cache(service_name, cache_type, max_age_hours=24):
-    """Load data from cache if it exists and is not too old"""
-    cache_path = get_cache_path(service_name, cache_type)
-    if not os.path.exists(cache_path):
-        return None
+def save_to_cache(data, category, key):
+    """Save data to cache - only for essential models and indexes"""
+    # Only cache essential items
+    essential_items = {
+        'embedding': ['model', 'index'],
+        'summarization': ['model']
+    }
     
+    if category in essential_items and key in essential_items[category]:
+        try:
+            cache_path = get_cache_path(category, key)
+            with open(cache_path, 'wb') as f:
+                pickle.dump(data, f)
+            logger.info(f"Saved {category} {key} to cache")
+        except Exception as e:
+            logger.error(f"Error saving to cache: {str(e)}")
+    else:
+        logger.debug(f"Skipping cache for non-essential item: {category} {key}")
+
+def load_from_cache(category, key):
+    """Load data from cache"""
     try:
-        with open(cache_path, 'rb') as f:
-            cached_data = pickle.load(f)
-        
-        # Check if cache is too old
-        cache_age = datetime.now() - cached_data['timestamp']
-        if cache_age.total_seconds() > max_age_hours * 3600:
-            return None
-        
-        return cached_data['data']
+        cache_path = get_cache_path(category, key)
+        if os.path.exists(cache_path):
+            with open(cache_path, 'rb') as f:
+                data = pickle.load(f)
+            logger.info(f"Loaded {category} {key} from cache")
+            return data
     except Exception as e:
-        print(f"Error loading cache for {service_name}_{cache_type}: {str(e)}")
-        return None
+        logger.error(f"Error loading from cache: {str(e)}")
+    return None
+
+def clear_cache():
+    """Clear all cached data"""
+    cache_dir = ensure_cache_dir()
+    for file in os.listdir(cache_dir):
+        try:
+            os.remove(os.path.join(cache_dir, file))
+            logger.info(f"Removed cache file: {file}")
+        except Exception as e:
+            logger.error(f"Error removing cache file {file}: {str(e)}")
 
 
 if __name__ == "__main__":

@@ -2,12 +2,11 @@ import logging
 import os
 import secrets
 from datetime import datetime
-
-from dotenv import load_dotenv
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import Flow
+from dotenv import load_dotenv
 
 from embedding_service import EmbeddingService
 from gmail_service import GmailService
@@ -35,9 +34,7 @@ app = Flask(__name__)
 def get_or_create_secret_key():
     secret_key = os.getenv('FLASK_SECRET_KEY')
     if not secret_key:
-        # Generate a new secret key
         secret_key = secrets.token_hex(32)
-        # Save it to .env file if it doesn't exist
         if not os.path.exists('.env'):
             with open('.env', 'w') as f:
                 f.write(f'FLASK_SECRET_KEY={secret_key}\n')
@@ -45,68 +42,26 @@ def get_or_create_secret_key():
     return secret_key
 
 
-logger.info("Initializing application...")
 app.secret_key = get_or_create_secret_key()
 
 # Initialize services
-logger.info("Initializing services...")
 gmail_service = GmailService()
-logger.info("GMAIL SERVICE IS DONE")
 embedding_service = EmbeddingService()
-logger.info("EMBEDDINGS ARE DONE")
 summarization_service = SummarizationService()
-logger.info("SUMMARINZATION IS DONE")
 
 # OAuth2 configuration
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 CLIENT_SECRETS_FILE = "credentials.json"
 
 # Get Google credentials and update .env
-logger.info("GETTING GOOGLE CREDENTIALS")
 client_id, client_secret = get_google_credentials()
 if not client_id or not client_secret:
     logger.warning("Warning: Google credentials not found. Please ensure credentials.json is present.")
 
 
-@app.route('/')
-def index():
-    if 'credentials' not in session:
-        logger.info("User not authenticated, redirecting to authorization")
-        return redirect(url_for('authorize'))
-    return render_template('index.html')
-
-
-@app.route('/authorize')
-def authorize():
-    logger.info("Starting OAuth2 authorization flow")
-    flow = Flow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE,
-        scopes=SCOPES,
-        redirect_uri=url_for('oauth2callback', _external=True)
-    )
-    authorization_url, state = flow.authorization_url(
-        access_type='offline',
-        include_granted_scopes='true'
-    )
-    session['state'] = state
-    return redirect(authorization_url)
-
-
-@app.route('/oauth2callback')
-def oauth2callback():
-    logger.info("Processing OAuth2 callback")
-    state = session['state']
-    flow = Flow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE,
-        scopes=SCOPES,
-        state=state,
-        redirect_uri=url_for('oauth2callback', _external=True)
-    )
-
-    authorization_response = request.url
-    flow.fetch_token(authorization_response=authorization_response)
-    credentials = flow.credentials
-    session['credentials'] = {
+def credentials_to_dict(credentials):
+    """Convert credentials object to dictionary"""
+    return {
         'token': credentials.token,
         'refresh_token': credentials.refresh_token,
         'token_uri': credentials.token_uri,
@@ -114,87 +69,180 @@ def oauth2callback():
         'client_secret': credentials.client_secret,
         'scopes': credentials.scopes
     }
-    logger.info("OAuth2 authentication completed successfully")
+
+
+def is_authenticated():
+    """Check if user is authenticated"""
+    if 'credentials' not in session:
+        return False
+
+    credentials = Credentials(**session['credentials'])
+    if credentials.expired and credentials.refresh_token:
+        try:
+            credentials.refresh(Request())
+            session['credentials'] = credentials_to_dict(credentials)
+            return True
+        except Exception as e:
+            logger.error(f"Error refreshing credentials: {str(e)}")
+            return False
+    return True
+
+
+@app.route('/')
+def index():
+    if not is_authenticated():
+        logger.info("User not authenticated, redirecting to authorization")
+        return redirect(url_for('authorize'))
+    return render_template('index.html')
+
+
+@app.route('/authorize')
+def authorize():
+    if is_authenticated():
+        return redirect(url_for('index'))
+
+    logger.info("Starting OAuth2 authorization flow")
+    flow = Flow.from_client_secrets_file(
+        CLIENT_SECRETS_FILE,
+        scopes=SCOPES,
+        redirect_uri=url_for('oauth2callback', _external=True)
+    )
+
+    authorization_url, state = flow.authorization_url(
+        access_type='offline',
+        include_granted_scopes='true',
+        prompt='consent'  # Force consent screen to ensure we get refresh token
+    )
+
+    # Store only the state in session
+    session['state'] = state
+    # Store the redirect URI for callback
+    session['redirect_uri'] = url_for('oauth2callback', _external=True)
+
+    return redirect(authorization_url)
+
+
+@app.route('/oauth2callback')
+def oauth2callback():
+    if 'state' not in session:
+        logger.error("No state found in session")
+        return redirect(url_for('authorize'))
+
+    try:
+        # Recreate the flow object
+        flow = Flow.from_client_secrets_file(
+            CLIENT_SECRETS_FILE,
+            scopes=SCOPES,
+            state=session['state'],
+            redirect_uri=session['redirect_uri']
+        )
+
+        authorization_response = request.url
+        flow.fetch_token(authorization_response=authorization_response)
+        credentials = flow.credentials
+
+        # Store credentials in session
+        session['credentials'] = credentials_to_dict(credentials)
+        logger.info("OAuth2 authentication completed successfully")
+
+        # Clean up session
+        session.pop('state', None)
+        session.pop('redirect_uri', None)
+
+        return redirect(url_for('index'))
+    except Exception as e:
+        logger.error(f"Error in OAuth2 callback: {str(e)}")
+        flash('Authentication failed. Please try again.', 'error')
+        return redirect(url_for('authorize'))
+
+
+@app.route('/logout')
+def logout():
+    session.clear()
     return redirect(url_for('index'))
+
+
+@app.route('/check-auth')
+def check_auth():
+    """Check if user is authenticated"""
+    return jsonify({'authenticated': is_authenticated()})
 
 
 @app.route('/search', methods=['POST'])
 def search():
+    """Search emails endpoint"""
     try:
-        if 'credentials' not in session:
+        if not is_authenticated():
             logger.warning("Unauthenticated search attempt")
-            return jsonify({'error': 'Not authenticated'}), 401
+            return jsonify({'error': 'Please authenticate first'}), 401
 
-        data = request.json
+        data = request.get_json()
         query = data.get('query')
-        date_range = data.get('dateRange')
+        date_range = data.get('dateRange', {})
+        should_summarize = data.get('summarize', False)
+        use_faiss = data.get('useFaiss', True)
+        top_k = data.get('topK', 5)
+        fetch_new_emails = data.get('fetchNewEmails', False)
+        similarity_threshold = 0.3  # Hardcoded threshold
 
-        if not query or not date_range:
-            logger.warning("Missing query or date range in search request")
-            return jsonify({'error': 'Missing query or date range'}), 400
+        if not query:
+            return jsonify({'error': 'Query is required'}), 400
 
-        logger.info(f"Processing search request: {query} for date range: {date_range}")
-
-        # Convert credentials from session to Credentials object
+        # Get credentials from session
         credentials = Credentials(**session['credentials'])
 
-        # Check if credentials need refresh
-        if credentials.expired and credentials.refresh_token:
-            logger.info("Refreshing expired credentials")
-            credentials.refresh(Request())
+        # Check if we need to update the database
+        last_update = session.get('last_email_update')
+        should_update = fetch_new_emails or (not last_update or (datetime.now() - datetime.fromisoformat(last_update)).days >= 1)
+        
+        if should_update:
+            try:
+                logger.info("Fetching new emails from Gmail")
+                # Fetch all emails (no date range for initial fetch)
+                emails = gmail_service.get_emails(credentials=credentials)
+                if emails:
+                    logger.info(f"Updating database with {len(emails)} emails")
+                    embedding_service.update_embeddings(emails)
+                    session['last_email_update'] = datetime.now().isoformat()
+                    logger.info("Database update completed")
+            except Exception as e:
+                logger.error(f"Error updating email database: {str(e)}")
+                if fetch_new_emails:
+                    return jsonify({'error': 'Failed to fetch new emails. Please try again.'}), 500
+                # Continue with existing database if update fails and fetch_new_emails is False
 
-        # Get emails from Gmail
+        # Search for similar emails
         try:
-            logger.info("Fetching emails from Gmail")
-            emails = gmail_service.get_emails(credentials, date_range)
-            logger.info(f"Retrieved {len(emails)} emails")
-        except Exception as e:
-            logger.error(f"Error fetching emails: {str(e)}")
-            return jsonify({'error': 'Failed to fetch emails. Please try again.'}), 500
-
-        if not emails:
-            logger.info("No emails found in specified date range")
-            return jsonify({'message': 'No emails found in the specified date range'})
-
-        # Generate embeddings for emails and query
-        try:
-            logger.info("Generating embeddings for emails and query")
-            email_embeddings = embedding_service.generate_embeddings([email['content'] for email in emails])
-            query_embedding = embedding_service.generate_embeddings([query])[0]
-        except Exception as e:
-            logger.error(f"Error generating embeddings: {str(e)}")
-            return jsonify({'error': 'Failed to process emails. Please try again.'}), 500
-
-        # Perform similarity search (limited to top 2 matches)
-        try:
-            logger.info("Finding similar emails")
-            similar_emails = embedding_service.find_similar_emails(query_embedding, email_embeddings, emails)
+            logger.info(f"Searching emails with {'FAISS' if use_faiss else 'cosine similarity'}")
+            similar_emails = embedding_service.search_emails(
+                query=query,
+                use_faiss=use_faiss,
+                top_k=top_k,
+                similarity_threshold=similarity_threshold
+            )
+            if not similar_emails:
+                return jsonify({'message': 'No similar emails found'})
             logger.info(f"Found {len(similar_emails)} similar emails")
         except Exception as e:
-            logger.error(f"Error finding similar emails: {str(e)}")
-            return jsonify({'error': 'Failed to find relevant emails. Please try again.'}), 500
+            logger.error(f"Error searching emails: {str(e)}")
+            return jsonify({'error': 'Failed to search emails. Please try again.'}), 500
 
-        if not similar_emails:
-            logger.info("No relevant emails found for query")
-            return jsonify({'message': 'No relevant emails found for your query'})
+        # Only summarize if requested
+        if should_summarize:
+            try:
+                logger.info("Generating summaries for similar emails")
+                similar_emails = summarization_service.summarize_emails(similar_emails)
+                logger.info("Summarization completed")
+            except Exception as e:
+                logger.error(f"Error in summarization: {str(e)}")
+                # Continue without summaries if summarization fails
+                pass
 
-        # Summarize the results
-        try:
-            logger.info("Summarizing emails")
-            summaries = summarization_service.summarize_emails(similar_emails)
-            logger.info("Email summarization completed")
-        except Exception as e:
-            logger.error(f"Error summarizing emails: {str(e)}")
-            return jsonify({'error': 'Failed to summarize emails. Please try again.'}), 500
-
-        return jsonify({
-            'results': summaries,
-            'timestamp': datetime.now().isoformat()
-        })
+        return jsonify({'results': similar_emails})
 
     except Exception as e:
-        logger.error(f"Unexpected error in search endpoint: {str(e)}")
-        return jsonify({'error': 'An unexpected error occurred. Please try again.'}), 500
+        logger.error(f"Error in search: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == '__main__':

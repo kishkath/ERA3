@@ -1,54 +1,169 @@
-# Gmail RAG Application
+# Gmail Search Assistant
 
-A Retrieval-Augmented Generation (RAG) application that allows users to search and summarize their Gmail contents using semantic search.
+A smart email search application that helps you find and understand your Gmail emails using natural language processing and AI. This application uses Retrieval-Augmented Generation (RAG) to provide intelligent search and summarization capabilities.
 
 ## Features
 
-- Custom date range selection for email search
-- Semantic search using natural language queries
-- Email content summarization
-- Secure Gmail OAuth2 authentication
-- Efficient vector search using FAISS
+- 🔍 Natural language search for emails
+- 📅 Flexible date range filtering
+- 📝 Optional email summarization
+- ⚡ Fast search with FAISS
+- 🔒 Secure Gmail authentication
+- 💾 Efficient caching system
 
-## Setup
+## How It Works
 
-1. Clone this repository
+### 1. Getting Started
+- Open the web application
+- Log in with your Google account
+- Allow the app to access your Gmail
+
+### 2. Search Options
+- Type what you're looking for in natural language
+- Choose your preferences:
+  - Turn summarization on/off
+  - Pick fast or precise search
+  - Select number of results (3-50)
+  - Toggle new email fetching
+
+### 3. Behind the Scenes
+- The app understands your search query
+- Finds similar emails in your inbox
+- Creates summaries if requested
+- Prepares the results
+
+### 4. View Results
+- See a list of matching emails
+- Read the summaries (if enabled)
+- Click to view the full email
+
+## Technical Overview
+
+### Core Components
+
+1. **Frontend**
+   - Modern UI with Bootstrap
+   - Responsive design
+   - User-friendly search interface
+   - Real-time feedback
+
+2. **Backend**
+   - Flask web framework
+   - Gmail API integration
+   - OAuth2 authentication
+   - Session management
+
+3. **Search Engine**
+   - Vector-based similarity search
+   - FAISS for fast retrieval
+   - Cosine similarity as fallback
+   - Configurable result count
+
+4. **Summarization**
+   - CPU-optimized models
+   - Parallel processing
+   - Efficient chunking
+   - Smart caching
+
+### Data Flow
+
+```mermaid
+graph LR
+    A[User Query] --> B[Retrieval]
+    B --> C[Email Database]
+    C --> D[Similar Emails]
+    D --> E[Augmentation]
+    E --> F[Context Enhancement]
+    F --> G[Generation]
+    G --> H[Summaries]
+```
+
+## Setup Guide
+
+1. Clone the repository
 2. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
-
-3. Set up Google OAuth2 credentials:
+3. Set up Gmail API credentials:
    - Go to Google Cloud Console
    - Create a new project
    - Enable Gmail API
-   - Create OAuth2 credentials
-   - Download the credentials and save as `credentials.json` in the project root
+   - Create OAuth 2.0 credentials
+   - Download and save as `credentials.json`
 
-4. Create a `.env` file with your configuration:
-   ```
-   FLASK_SECRET_KEY=your_secret_key
-   GOOGLE_CLIENT_ID=your_client_id
-   GOOGLE_CLIENT_SECRET=your_client_secret
-   ```
-
-5. Run the application:
+4. Run the application:
    ```bash
    python app.py
    ```
 
-## Usage
-
-1. Access the application at `http://localhost:5000`
-2. Authenticate with your Gmail account
-3. Select date range and enter your search query
-4. View summarized results of matching emails
+5. Open your browser and visit:
+   ```
+   http://localhost:5000
+   ```
 
 ## Project Structure
 
-- `app.py`: Main Flask application
-- `gmail_service.py`: Gmail API integration
-- `embedding_service.py`: Text embedding and FAISS operations
-- `summarization_service.py`: Email summarization logic
-- `static/`: Frontend assets
-- `templates/`: HTML templates 
+```
+├── app.py                 # Main Flask application
+├── gmail_service.py       # Gmail API integration
+├── embedding_service.py   # Text embedding and search
+├── summarization_service.py # Email summarization
+├── utils.py              # Utility functions
+├── templates/            # Frontend templates
+│   ├── base.html        # Base template
+│   └── index.html       # Search interface
+└── cache/               # Cached data
+    ├── embeddings/      # Email embeddings
+    ├── faiss/          # Search index
+    ├── summaries/      # Email summaries
+    └── emails.db       # Email database
+```
+
+## Example Usage
+
+1. **Search Queries:**
+   - "Find emails about project meeting last week"
+   - "Show me invoices from March"
+   - "Where are the meeting notes from yesterday?"
+
+2. **What You'll See:**
+   - List of relevant emails
+   - Who sent them
+   - When they were sent
+   - What they're about (summary)
+
+3. **Tips for Best Results:**
+   - Use natural language
+   - Be specific about what you want
+   - Use date ranges to narrow results
+   - Enable summarization for quick overview
+
+## Requirements
+
+- Python 3.8+
+- Flask
+- Google API Client
+- sentence-transformers
+- FAISS
+- PyTorch
+- Other dependencies in requirements.txt
+
+## Security
+
+- Uses OAuth2 for Gmail authentication
+- Stores data locally only
+- Implements proper session management
+- Includes input validation
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## License
+
+MIT License - see LICENSE file for details 
