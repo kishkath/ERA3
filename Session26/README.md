@@ -2,6 +2,10 @@
 
 A smart email search application that helps you find and understand your Gmail emails using natural language processing and AI. This application uses Retrieval-Augmented Generation (RAG) to provide intelligent search and summarization capabilities.
 
+YT link demo: https://www.youtube.com/watch?v=9WFf97pvE4I
+
+Workflow : Checkout workflow.md
+
 ## Features
 
 - 🔍 Natural language search for emails
@@ -139,6 +143,10 @@ graph LR
    - Use date ranges to narrow results
    - Enable summarization for quick overview
 
+![rag_based_app2](https://github.com/user-attachments/assets/5e32bc7e-85e1-4343-853a-7f1d8b216b16)
+
+![rag_based_app1](https://github.com/user-attachments/assets/b0fcee9f-ddb8-4105-8e96-bf2e0fa3adec)
+
 ## Requirements
 
 - Python 3.8+
@@ -155,15 +163,3 @@ graph LR
 - Stores data locally only
 - Implements proper session management
 - Includes input validation
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## License
-
-MIT License - see LICENSE file for details 
