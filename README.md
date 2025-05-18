@@ -1,21 +1,54 @@
-# ERA3
+# Gmail RAG Application
 
-ERA (Extensive Re-Imagined AI)
+A Retrieval-Augmented Generation (RAG) application that allows users to search and summarize their Gmail contents using semantic search.
 
-  
-<img src="https://github.com/user-attachments/assets/7b1f3b09-d9b7-43f8-88e5-aec59eaa44cf" width = 600 height = 480>
+## Features
 
-## Extensive Re-Imagined AI. (VISION + TEXT + AUDIO)
-   -------------------------------------------------
+- Custom date range selection for email search
+- Semantic search using natural language queries
+- Email content summarization
+- Secure Gmail OAuth2 authentication
+- Efficient vector search using FAISS
 
-    * Covering neural networks, transformers, LLMs, and GenAI models. Practical skills are emphasized through continuous integration of MLOps practices, frontend and backend development, and deployment strategies.
-    
-    * A key differentiator of this course is the heavy use of modern coding tools like Cursor and Claude dev, which significantly enhance coding efficiency, debugging, and experimentation.
+## Setup
 
-    
-### 🕗 October2025 - July 2025
+1. Clone this repository
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-**Session1**: Introduction to AI, Neural Networks, and Development Tools
+3. Set up Google OAuth2 credentials:
+   - Go to Google Cloud Console
+   - Create a new project
+   - Enable Gmail API
+   - Create OAuth2 credentials
+   - Download the credentials and save as `credentials.json` in the project root
 
-**Session2**: Python Essentials, Version Control, and Web Development
-Basics
+4. Create a `.env` file with your configuration:
+   ```
+   FLASK_SECRET_KEY=your_secret_key
+   GOOGLE_CLIENT_ID=your_client_id
+   GOOGLE_CLIENT_SECRET=your_client_secret
+   ```
+
+5. Run the application:
+   ```bash
+   python app.py
+   ```
+
+## Usage
+
+1. Access the application at `http://localhost:5000`
+2. Authenticate with your Gmail account
+3. Select date range and enter your search query
+4. View summarized results of matching emails
+
+## Project Structure
+
+- `app.py`: Main Flask application
+- `gmail_service.py`: Gmail API integration
+- `embedding_service.py`: Text embedding and FAISS operations
+- `summarization_service.py`: Email summarization logic
+- `static/`: Frontend assets
+- `templates/`: HTML templates 
