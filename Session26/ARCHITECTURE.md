@@ -1,125 +1,71 @@
-# Gmail RAG Application Architecture
+# Gmail RAG Application - Simplified Architecture
 
-## System Overview
+## What This App Does
+This application helps you search through your Gmail emails using natural language and get smart summaries of relevant emails. Think of it like having a smart assistant that can understand what you're looking for in your emails.
 
-The Gmail RAG (Retrieval-Augmented Generation) application is a Flask-based web application that enables semantic search and summarization of Gmail contents. The system uses modern AI techniques including embeddings and natural language processing to provide intelligent email search capabilities.
-
-## Architecture Flow
+## Simple Flow Diagram
 
 ```mermaid
-graph TD
-    A[User] -->|1. Access| B[Web Interface]
-    B -->|2. OAuth2| C[Google Authentication]
-    C -->|3. Auth Token| B
-    B -->|4. Search Request| D[Flask Backend]
-    D -->|5. Fetch Emails| E[Gmail Service]
-    E -->|6. Email Data| D
-    D -->|7. Generate Embeddings| F[Embedding Service]
-    F -->|8. Vector Search| D
-    D -->|9. Summarize Results| G[Summarization Service]
-    G -->|10. Processed Results| D
-    D -->|11. JSON Response| B
-    B -->|12. Display Results| A
+graph LR
+    A[You] -->|1. Open App| B[Web Page]
+    B -->|2. Login with Google| C[Google Login]
+    C -->|3. Access Granted| B
+    B -->|4. Type Search| D[Search Process]
+    D -->|5. Get Emails| E[Your Gmail]
+    D -->|6. Find Matches| F[Smart Search]
+    D -->|7. Create Summary| G[Summarizer]
+    D -->|8. Show Results| B
+    B -->|9. View Results| A
 
-    subgraph Frontend
-        B
-    end
-
-    subgraph Backend Services
-        D
-        E
-        F
-        G
-    end
-
-    subgraph External Services
-        C
-    end
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style B fill:#bbf,stroke:#333,stroke-width:2px
+    style D fill:#bfb,stroke:#333,stroke-width:2px
 ```
 
-## Component Details
+## How It Works - Step by Step
 
-### 1. Frontend Components
-- **Web Interface (`templates/index.html`, `static/js/app.js`, `static/css/styles.css`)**
-  - Modern, responsive UI built with HTML, CSS, and JavaScript
-  - Date range selection with Flatpickr integration
-  - Real-time search results display
-  - Loading state management
+1. **Starting Point**
+   - You open the web application
+   - You log in with your Google account
+   - The app gets permission to read your emails
 
-### 2. Backend Components
-- **Flask Application (`app.py`)**
-  - Main application server
-  - Route handling and request processing
-  - Session management
-  - Error handling and logging
+2. **Search Process**
+   - You type what you're looking for (like "meeting notes from last week")
+   - You pick a date range to search in
+   - The app starts searching
 
-- **Gmail Service (`gmail_service.py`)**
-  - Gmail API integration
-  - Email fetching and processing
-  - Authentication handling
-  - Email content extraction
+3. **Behind the Scenes**
+   - The app looks through your emails in the chosen date range
+   - It uses AI to understand what you're looking for
+   - It finds the most relevant emails
+   - It creates short summaries of the important parts
 
-- **Embedding Service (`embedding_service.py`)**
-  - Text embedding generation
-  - Vector similarity search
-  - FAISS integration for efficient search
+4. **Results**
+   - You see a list of matching emails
+   - Each email shows:
+     - Subject
+     - Sender
+     - Date
+     - A short summary of what it's about
 
-- **Summarization Service (`summarization_service.py`)**
-  - Email content summarization
-  - Natural language processing
-  - Result formatting
+## Main Parts of the App
 
-### 3. Authentication Flow
-1. User accesses the application
-2. OAuth2 authentication with Google
-3. Token management and refresh
-4. Secure session handling
+1. **Frontend (What You See)**
+   - The web page you interact with
+   - Search box and date picker
+   - Results display
 
-### 4. Search Flow
-1. User submits search query with date range
-2. Backend fetches relevant emails
-3. Generates embeddings for query and emails
-4. Performs vector similarity search
-5. Summarizes matching emails
-6. Returns formatted results
+2. **Backend (What You Don't See)**
+   - Email fetcher (gets your emails)
+   - Smart search (finds relevant emails)
+   - Summarizer (creates short summaries)
 
-## Data Flow
+## Security
+- Your Google account is used for secure login
+- The app only reads your emails (can't send or delete)
+- Your data stays private
 
-1. **Input Processing**
-   - User query and date range parameters
-   - OAuth2 credentials
-   - Email content
-
-2. **Processing Pipeline**
-   - Email retrieval
-   - Text embedding generation
-   - Vector similarity search
-   - Content summarization
-
-3. **Output Generation**
-   - JSON response with summarized results
-   - Error handling and status messages
-   - Loading states
-
-## Security Considerations
-
-- OAuth2 authentication flow
-- Secure session management
-- Environment variable configuration
-- SSL/TLS encryption
-- API key management
-
-## Dependencies
-
-- Flask (Web Framework)
-- Google API Client Library
-- FAISS (Vector Search)
-- Natural Language Processing Libraries
-- Frontend Libraries (Flatpickr)
-
-## Configuration
-
-- Environment variables (.env)
-- Google Cloud Console setup
-- OAuth2 credentials
-- API endpoints configuration 
+## What You Need to Use It
+- A Google account
+- A web browser
+- Internet connection 
