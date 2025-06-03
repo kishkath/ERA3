@@ -1,0 +1,14 @@
+{
+    "banned_words": [
+        "inappropriate",
+        "offensive",
+        "sensitive",
+        "confidential",
+        "private",
+        "secret",
+        "restricted",
+        "classified",
+        "internal",
+        "proprietary"
+    ]
+} 
