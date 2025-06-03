@@ -1,0 +1,598 @@
+🧑 What do you want to solve today? → calculate the factorial of 10
+🔁 Step 1/3 starting...
+[21:48:12] [perception] Raw output: ```json
+{
+  "intent": "Calculate factorial of a number",
+  "entities": ["factorial", "10"],
+  "tool_hint": "python sandbox",
+  "selected_servers": ["math"]
+}
+```
+result {'intent': 'Calculate factorial of a number', 'entities': ['factorial', '10'], 'tool_hint': 'python sandbox', 'selected_servers': ['math']}
+[perception] intent='Calculate factorial of a number' entities=['factorial', '10'] tool_hint='python sandbox' tags=[] selected_servers=['math']
+[21:48:14] [plan] LLM output: ```python
+import json
+async def solve():
+    # FUNCTION_CALL: 1
+    """Compute the factorial of a number. Usage: input={"input": {"a": 5}} result = await mcp.call_tool('factorial', input)"""
+    input = {"input": {"a": 10}}
+    result = await mcp.call_tool('factorial', input)
+    final_result = json.loads(result.content[0].text)["result"]
+
+    # FINAL_RESULT
+    return f"FINAL_ANSWER: {final_result}"
+```
+[plan] import json
+async def solve():
+    # FUNCTION_CALL: 1
+    """Compute the factorial of a number. Usage: input={"input": {"a": 5}} result = await mcp.call_tool('factorial', input)"""
+    input = {"input": {"a": 10}}
+    result = await mcp.call_tool('factorial', input)
+    final_result = json.loads(result.content[0].text)["result"]
+
+    # FINAL_RESULT
+    return f"FINAL_ANSWER: {final_result}"
+[loop] Detected solve() plan — running sandboxed...
+[action] 🔍 Entered run_python_sandbox()
+
+💡 Final Answer: 3628800
+
+
+##############################################################################################################
+
+🧑 What do you want to solve today? → who is the current indian cricket captain
+🔁 Step 1/3 starting...
+Extract_Perception:  who is the current indian cricket captain {'math': {'id': 'math', 'script': 'mcp_server_1.py', 'cwd': 'C:/Users/saikir/learnings/S9', 'description': 'Most used Math tools, including special string-int conversions, fibonacci, python sandbox, shell and sql related tools', 'capabilities': ['add', 'subtract', 'multiply', 'divide', 'power', 'cbrt', 'factorial', 'remainder', 'sin', 'cos', 'tan', 'mine', 'create_thumbnail', 'strings_to_chars_to_int', 'int_list_to_exponential_sum', 'fibonacci_numbers'], 'basic_tools': ['run_python_sandbox']}, 'documents': {'id': 'documents', 'script': 'mcp_server_2.py', 'cwd': 'C:/Users/saikir/learnings/S9', 'description': 'Load, search and extract within webpages, local PDFs or other documents. Web and document specialist', 'capabilities': ['search_stored_documents', 'convert_webpage_url_into_markdown', 'extract_pdf'], 'basic_tools': ['convert_webpage_url_into_markdown', 'duckduckgo_search_results']}, 'websearch': {'id': 'websearch', 'script': 'mcp_server_3.py', 'cwd': 'C:/Users/saikir/learnings/S9', 'description': 'Webtools to search internet for queries and fetch content for a specific web page', 'capabilities': ['duckduckgo_search_results', 'download_raw_html_from_url'], 'basic_tools': ['duckduckgo_search_results']}}
+>>prompt: prompt = f"""
+You are a perception engine helping an AI agent to decide which MCP server(s) are most relevant to a user's query.
+
+🔧 MCP Server Catalog:
+- math: Most used Math tools, including special string-int conversions, fibonacci, python sandbox, shell and sql related tools
+- documents: Load, search and extract within webpages, local PDFs or other documents. Web and document specialist
+- websearch: Webtools to search internet for queries and fetch content for a specific web page
+
+🧠 User Query:
+"who is the current indian cricket captain"
+
+🎯 Your Tasks:
+- Identify the INTENT of the user's query.
+- Extract important ENTITIES (e.g., company names, numbers, concepts).
+- Suggest a TOOL_HINT if you can guess a useful tool (optional).
+- Pick the most relevant MCP server IDs from the catalog above.
+
+📋 Your Output Format (in JSON):
+{
+  "intent": "...",
+  "entities": [...],
+  "tool_hint": "...",
+  "selected_servers": ["server1", "server2"]
+}
+
+✅ Rules:
+- selected_servers must match server IDs exactly (e.g., server1, server2).
+- If none are a clear match, select all servers.
+- Keep output short and clean.
+
+Now generate the output:
+"""
+[22:03:30] [perception] Raw output: ```json
+{
+  "intent": "Find the current captain of the Indian cricket team.",
+  "entities": ["Indian cricket team", "captain"],
+  "tool_hint": "websearch",
+  "selected_servers": ["websearch"]
+}
+```
+result {'intent': 'Find the current captain of the Indian cricket team.', 'entities': ['Indian cricket team', 'captain'], 'tool_hint': 'websearch', 'selected_servers': ['websearch']}
+[perception] intent='Find the current captain of the Indian cricket team.' entities=['Indian cricket team', 'captain'] tool_hint='websearch' tags=[] selected_servers=['websearch']
+[22:03:32] [plan] LLM output: ```python
+import json
+async def solve():
+    # FUNCTION_CALL: 1
+    """Search DuckDuckGo. Usage: input={"input": {"query": "latest AI developments", "max_results": 5} } result = await mcp.call_tool('duckduckgo_search_results', input)"""
+    input = {"input": {"query": "current indian cricket captain", "max_results": 5}}
+    result = await mcp.call_tool('duckduckgo_search_results', input)
+
+    # FURTHER_PROCESSING_REQUIRED
+    return f"FURTHER_PROCESSING_REQUIRED: {result}"
+```
+[plan] import json
+async def solve():
+    # FUNCTION_CALL: 1
+    """Search DuckDuckGo. Usage: input={"input": {"query": "latest AI developments", "max_results": 5} } result = await mcp.call_tool('duckduckgo_search_results', input)"""
+    input = {"input": {"query": "current indian cricket captain", "max_results": 5}}
+    result = await mcp.call_tool('duckduckgo_search_results', input)
+
+    # FURTHER_PROCESSING_REQUIRED
+    return f"FURTHER_PROCESSING_REQUIRED: {result}"
+[loop] Detected solve() plan — running sandboxed...
+[action] 🔍 Entered run_python_sandbox()
+[22:03:38] [loop] 📨 Forwarding intermediate result to next step:
+Original user task: who is the current indian cricket captain
+
+Your last tool produced this result:
+
+meta=None content=[TextContent(type='text', text='{"result": "Found 5 search results:\\n\\n1. List of India national cricket captains - Wikipedia\\n   URL: https://en.wikipedia.org/wiki/Li
+st_of_India_national_cricket_captains\\n   Summary: This is the list ofcaptainsofIndiancricketteam who have led the team in at least one internationalcricketmatch. Acaptainis the appointed
+ leader of the team, having several additional roles and responsibilities over and above those of the other players. As in other sports, thecaptainis usually experienced and has good commu
+nication skills and is likely to be one of the most regular ...\\n\\n2. Shubman Gill appointed as new India captain ahead of Test series ...\\n   URL: https://www.skysports.com/cricket/new
+s/12173/13373749/shubman-gill-appointed-as-new-india-captain-ahead-of-test-series-against-england\\n   Summary: Shubman Gill will lead India ascaptainfor their five-Test tour of England, b
+eginning on June 20 at Headingley, live on Sky Sports; he takes over from the recently-retired Rohit Sharma as India ...\\n\\n3. Shubman Gill To Virat Kohli: Full List Of 37 India Test Cap
+tains - News18\\n   URL: https://www.news18.com/cricket/list-of-indias-test-captains-9346422.html\\n   Summary: StarIndianbatter Shubman Gill on Saturday (May 24) has been appointed as the
+ newcaptainof theIndianmen\'s Testcricketteam. The 25-year-old right-handed batter is the 37th cricketer to take the top job, and he will succeed Rohit Sharma after the 38-year-old Mumbaik
+ar announced his retirement from the five-day format of the game on May 7.\\n\\n4. Shubman Gill becomes India Test captain and fifth youngest - complete ...\\n   URL: https://timesofindia.
+indiatimes.com/sports/cricket/news/shubman-gill-becomes-india-test-captain-and-fifth-youngest-complete-list/articleshow/121377863.cms\\n   Summary: Shubman Gill, the 25-year-oldIndianbatte
+r, has been appointed as the newcaptainof theIndianmen\'s Testcricketteam on Saturday, May 24.He will become India\'s 37th Testcaptain, succeeding ...\\n\\n5. Shubman Gill is India\'s 37th
+ Test captain: Full list of players who ...\\n   URL: https://www.hindustantimes.com/cricket/shubman-gill-is-india-37th-test-captain-full-list-of-players-who-have-led-the-indian-cricket-te
+am-across-589-matches-101748057612067.html\\n   Summary: As the table shows, leading India in Testcricketis a formidable challenge, with only a select fewcaptainsachieving more than 10 victories. Just five have reached this milestone: Azharuddin ...\\n"}', annotations=None)] isError=False
+
+If this fully answers the task, return:
+FINAL_ANSWER: your answer
+
+Otherwise, return the next FUNCTION_CALL.
+
+
+[22:03:38] [loop] 🔁 Continuing based on FURTHER_PROCESSING_REQUIRED — Step 1 continues...
+🔁 Step 2/3 starting...
+Extract_Perception:  Original user task: who is the current indian cricket captain
+
+Your last tool produced this result:
+
+meta=None content=[TextContent(type='text', text='{"result": "Found 5 search results:\\n\\n1. List of India national cricket captains - Wikipedia\\n   URL: https://en.wikipedia.org/wiki/Li
+st_of_India_national_cricket_captains\\n   Summary: This is the list ofcaptainsofIndiancricketteam who have led the team in at least one internationalcricketmatch. Acaptainis the appointed
+ leader of the team, having several additional roles and responsibilities over and above those of the other players. As in other sports, thecaptainis usually experienced and has good commu
+nication skills and is likely to be one of the most regular ...\\n\\n2. Shubman Gill appointed as new India captain ahead of Test series ...\\n   URL: https://www.skysports.com/cricket/new
+s/12173/13373749/shubman-gill-appointed-as-new-india-captain-ahead-of-test-series-against-england\\n   Summary: Shubman Gill will lead India ascaptainfor their five-Test tour of England, b
+eginning on June 20 at Headingley, live on Sky Sports; he takes over from the recently-retired Rohit Sharma as India ...\\n\\n3. Shubman Gill To Virat Kohli: Full List Of 37 India Test Cap
+tains - News18\\n   URL: https://www.news18.com/cricket/list-of-indias-test-captains-9346422.html\\n   Summary: StarIndianbatter Shubman Gill on Saturday (May 24) has been appointed as the
+ newcaptainof theIndianmen\'s Testcricketteam. The 25-year-old right-handed batter is the 37th cricketer to take the top job, and he will succeed Rohit Sharma after the 38-year-old Mumbaik
+ar announced his retirement from the five-day format of the game on May 7.\\n\\n4. Shubman Gill becomes India Test captain and fifth youngest - complete ...\\n   URL: https://timesofindia.
+indiatimes.com/sports/cricket/news/shubman-gill-becomes-india-test-captain-and-fifth-youngest-complete-list/articleshow/121377863.cms\\n   Summary: Shubman Gill, the 25-year-oldIndianbatte
+r, has been appointed as the newcaptainof theIndianmen\'s Testcricketteam on Saturday, May 24.He will become India\'s 37th Testcaptain, succeeding ...\\n\\n5. Shubman Gill is India\'s 37th
+ Test captain: Full list of players who ...\\n   URL: https://www.hindustantimes.com/cricket/shubman-gill-is-india-37th-test-captain-full-list-of-players-who-have-led-the-indian-cricket-te
+am-across-589-matches-101748057612067.html\\n   Summary: As the table shows, leading India in Testcricketis a formidable challenge, with only a select fewcaptainsachieving more than 10 victories. Just five have reached this milestone: Azharuddin ...\\n"}', annotations=None)] isError=False
+
+If this fully answers the task, return:
+FINAL_ANSWER: your answer
+
+Otherwise, return the next FUNCTION_CALL. {'math': {'id': 'math', 'script': 'mcp_server_1.py', 'cwd': 'C:/Users/saikir/learnings/S9', 'description': 'Most used Math tools, including specia
+l string-int conversions, fibonacci, python sandbox, shell and sql related tools', 'capabilities': ['add', 'subtract', 'multiply', 'divide', 'power', 'cbrt', 'factorial', 'remainder', 'sin
+', 'cos', 'tan', 'mine', 'create_thumbnail', 'strings_to_chars_to_int', 'int_list_to_exponential_sum', 'fibonacci_numbers'], 'basic_tools': ['run_python_sandbox']}, 'documents': {'id': 'do
+cuments', 'script': 'mcp_server_2.py', 'cwd': 'C:/Users/saikir/learnings/S9', 'description': 'Load, search and extract within webpages, local PDFs or other documents. Web and document spec
+ialist', 'capabilities': ['search_stored_documents', 'convert_webpage_url_into_markdown', 'extract_pdf'], 'basic_tools': ['convert_webpage_url_into_markdown', 'duckduckgo_search_results']}
+, 'websearch': {'id': 'websearch', 'script': 'mcp_server_3.py', 'cwd': 'C:/Users/saikir/learnings/S9', 'description': 'Webtools to search internet for queries and fetch content for a specific web page', 'capabilities': ['duckduckgo_search_results', 'download_raw_html_from_url'], 'basic_tools': ['duckduckgo_search_results']}}
+>>prompt: prompt = f"""
+You are a perception engine helping an AI agent to decide which MCP server(s) are most relevant to a user's query.
+
+🔧 MCP Server Catalog:
+- math: Most used Math tools, including special string-int conversions, fibonacci, python sandbox, shell and sql related tools
+- documents: Load, search and extract within webpages, local PDFs or other documents. Web and document specialist
+- websearch: Webtools to search internet for queries and fetch content for a specific web page
+
+🧠 User Query:
+"Original user task: who is the current indian cricket captain
+
+Your last tool produced this result:
+
+meta=None content=[TextContent(type='text', text='{"result": "Found 5 search results:\\n\\n1. List of India national cricket captains - Wikipedia\\n   URL: https://en.wikipedia.org/wiki/Li
+st_of_India_national_cricket_captains\\n   Summary: This is the list ofcaptainsofIndiancricketteam who have led the team in at least one internationalcricketmatch. Acaptainis the appointed
+ leader of the team, having several additional roles and responsibilities over and above those of the other players. As in other sports, thecaptainis usually experienced and has good commu
+nication skills and is likely to be one of the most regular ...\\n\\n2. Shubman Gill appointed as new India captain ahead of Test series ...\\n   URL: https://www.skysports.com/cricket/new
+s/12173/13373749/shubman-gill-appointed-as-new-india-captain-ahead-of-test-series-against-england\\n   Summary: Shubman Gill will lead India ascaptainfor their five-Test tour of England, b
+eginning on June 20 at Headingley, live on Sky Sports; he takes over from the recently-retired Rohit Sharma as India ...\\n\\n3. Shubman Gill To Virat Kohli: Full List Of 37 India Test Cap
+tains - News18\\n   URL: https://www.news18.com/cricket/list-of-indias-test-captains-9346422.html\\n   Summary: StarIndianbatter Shubman Gill on Saturday (May 24) has been appointed as the
+ newcaptainof theIndianmen\'s Testcricketteam. The 25-year-old right-handed batter is the 37th cricketer to take the top job, and he will succeed Rohit Sharma after the 38-year-old Mumbaik
+ar announced his retirement from the five-day format of the game on May 7.\\n\\n4. Shubman Gill becomes India Test captain and fifth youngest - complete ...\\n   URL: https://timesofindia.
+indiatimes.com/sports/cricket/news/shubman-gill-becomes-india-test-captain-and-fifth-youngest-complete-list/articleshow/121377863.cms\\n   Summary: Shubman Gill, the 25-year-oldIndianbatte
+r, has been appointed as the newcaptainof theIndianmen\'s Testcricketteam on Saturday, May 24.He will become India\'s 37th Testcaptain, succeeding ...\\n\\n5. Shubman Gill is India\'s 37th
+ Test captain: Full list of players who ...\\n   URL: https://www.hindustantimes.com/cricket/shubman-gill-is-india-37th-test-captain-full-list-of-players-who-have-led-the-indian-cricket-te
+am-across-589-matches-101748057612067.html\\n   Summary: As the table shows, leading India in Testcricketis a formidable challenge, with only a select fewcaptainsachieving more than 10 victories. Just five have reached this milestone: Azharuddin ...\\n"}', annotations=None)] isError=False
+
+If this fully answers the task, return:
+FINAL_ANSWER: your answer
+
+Otherwise, return the next FUNCTION_CALL."
+
+🎯 Your Tasks:
+- Identify the INTENT of the user's query.
+- Extract important ENTITIES (e.g., company names, numbers, concepts).
+- Suggest a TOOL_HINT if you can guess a useful tool (optional).
+- Pick the most relevant MCP server IDs from the catalog above.
+
+📋 Your Output Format (in JSON):
+{
+  "intent": "...",
+  "entities": [...],
+  "tool_hint": "...",
+  "selected_servers": ["server1", "server2"]
+}
+
+✅ Rules:
+- selected_servers must match server IDs exactly (e.g., server1, server2).
+- If none are a clear match, select all servers.
+- Keep output short and clean.
+
+Now generate the output:
+"""
+[22:03:40] [perception] Raw output: ```json
+{
+  "intent": "Determine the current captain of the Indian cricket team.",
+  "entities": ["Indian cricket team", "captain"],
+  "tool_hint": "Documents (to extract the answer from the search results)",
+  "selected_servers": ["documents"]
+}
+```
+result {'intent': 'Determine the current captain of the Indian cricket team.', 'entities': ['Indian cricket team', 'captain'], 'tool_hint': 'Documents (to extract the answer from the search results)', 'selected_servers': ['documents']}
+[perception] intent='Determine the current captain of the Indian cricket team.' entities=['Indian cricket team', 'captain'] tool_hint='Documents (to extract the answer from the search results)' tags=[] selected_servers=['documents']
+[22:03:43] [plan] LLM output: ```python
+async def solve():
+    # FUNCTION_CALL: 1
+    """Search documents to get relevant extracts. Usage: input={"input": {"query": "your query"}} result = await mcp.call_tool('search_stored_documents', input)"""
+    input = {"input": {"query": "who is the current indian cricket captain"}}
+    result = await mcp.call_tool('search_stored_documents', input)
+
+    # FURTHER_PROCESSING_REQUIRED
+    return f"FURTHER_PROCESSING_REQUIRED: {result}"
+```
+[plan] async def solve():
+    # FUNCTION_CALL: 1
+    """Search documents to get relevant extracts. Usage: input={"input": {"query": "your query"}} result = await mcp.call_tool('search_stored_documents', input)"""
+    input = {"input": {"query": "who is the current indian cricket captain"}}
+    result = await mcp.call_tool('search_stored_documents', input)
+
+    # FURTHER_PROCESSING_REQUIRED
+    return f"FURTHER_PROCESSING_REQUIRED: {result}"
+[loop] Detected solve() plan — running sandboxed...
+[action] 🔍 Entered run_python_sandbox()
+[22:04:02] [loop] 📨 Forwarding intermediate result to next step:
+Original user task: who is the current indian cricket captain
+
+Your last tool produced this result:
+
+meta=None content=[TextContent(type='text', text="In addition to the basic kit, some players wear protective gear to prevent injury caused by the ball, which is a hard, solid spheroid made
+ of compressed leather with a slightly raised sewn seam enclosing a cork core layered with tightly wound string. The earliest known definite reference to cricket is to it being played in S
+outh East England in the mid-16th century. It spread globally with the expansion of the British Empire, with the first international matches in the second half of the 19th century. The gam
+e's governing body is the International Cricket Council (ICC), which has over 100 members, twelve of which are full members who play Test matches. The game's rules, the Laws of Cricket, ar
+e maintained by Marylebone Cricket Club (MCC) in London. The sport is followed primarily in South Asia, Australia, New Zealand, the United Kingdom, Southern Africa, and the West Indies. Wh
+ile traditionally, cricket has largely been played by men, Women's cricket has experienced large growth in the 21st century. The most successful side playing international cricket is Austr
+alia, which has won eight One Day International trophies, including six World Cups, more than any other country, and has been the top-rated Test side more than any other country.\n[Source:
+ cricket.txt, ID: cricket_1]", annotations=None), TextContent(type='text', text='Cricket is a bat-and-ball game played between two teams of eleven players on a field, at the centre of whic
+h is a 22-yard (20-metre; 66-foot) pitch with a wicket at each end, each comprising two bails (small sticks) balanced on three stumps. Two players from the batting team, the striker and no
+nstriker, stand in front of either wicket holding bats, while one player from the fielding team, the bowler, bowls the ball toward the striker\'s wicket from the opposite end of the pitch.
+ The striker\'s goal is to hit the bowled ball with the bat and then switch places with the nonstriker, with the batting team scoring one run for each of these exchanges. Runs are also sco
+red when the ball reaches the boundary of the field or when the ball is bowled illegally. The fielding team aims to prevent runs by dismissing batters (so they are "out"). Dismissal can oc
+cur in various ways, including being bowled (when the ball hits the striker\'s wicket and dislodges the bails), and by the fielding side either catching the ball after it is hit by the bat
+ but before it hits the ground, or hitting a wicket with the ball before a batter can cross the crease line in front of the wicket. When ten batters have been dismissed, the innings (playi
+ng phase) ends and the teams swap roles. Forms of cricket range from traditional Test matches played over five days to the newer Twenty20 format (also known as T20), in which each team bat
+s for a single innings of 20 overs (each "over" being a set of 6 fair opportunities for the batting team to score) and the game generally lasts three to four hours. Traditionally, crickete
+rs play in all-white kit, but in limited overs cricket, they wear club or team colours.\n[Source: cricket.txt, ID: cricket_0]', annotations=None), TextContent(type='text', text='Crore rece
+ived from Gensol, as mentioned in para 63 above, Rs. 382.84 Crore was transferred by Wellray to various other entities. These transfers may be broadly categorized as follows: |Name of the
+Party|Amount paid during FY23 and FY24 (Rs.)| |---|---| |Related/Linked parties of Gensol|246.07 Crore| |Sharekhan Limited|40.70 Crore| |Public Shareholders of Gensol|5.17 Crore| |Others|9
+0.90 Crore| |Total|382.84 Crore| 66. The break-up of the funds paid to related parties and connected entities of Gensol by Wellray in FY 23 and FY 24 is given in the Table below: **_______
+____________________________________________________________________ ** **Interim Order in the matter of Gensol Engineering Limited Page 19 of 29** ----- |Col1|Col2|Col3|Col4|Rs. In Crores
+| |---|---|---|---|---| |Name of the Party|Funds transferred during FY 2022-23|Funds transferred during FY 2023-24|Total amount paid during FY 2022-23 to FY 2023-24|Relationship with Genso
+l| |Anmol Singh Jaggi|19.48|6.28|25.76|Promoter of Gensol| |Puneet Singh Jaggi|10.66|2.90|13.55|Promoter of Gensol| |Gensol Ventures Pvt. Ltd.|-|16.00|16.00|Promoter of Gensol| |Capbridge
+Venture LLP|5.00|6.00|11.00|Designated Partners are Anmol Singh Jaggi and Puneet Singh Jaggi| |Matrix Gas and Renewable Ltd.|40.20|23.70|63.90|Disclosed Related Party| |Gosolar Ventures Pv
+t. Ltd.|19.80|48.20|68.00|Disclosed Related Party| |Gensol Consultants Pvt. Ltd.|11.50|10.10|21.60|Disclosed Related Party| |Blu-Smart Fleet Pvt. Ltd.|10.00|-|10.00|Disclosed Related Party
+| |Prescinto Technologies Pvt. Ltd.|3.84|5.42|9.26|Disclosed Related Party| |Param Renewable Energy Pvt. Ltd.|7.00||7.00|Disclosed Related Party| |Total|127.47|118.60|246.07|| ### 67. As b
+rought out in the Table above, Wellray has transferred funds amounting to Rs. 39.31 Crore to Anmol Singh Jaggi and Puneet Singh Jaggi, promoters of Gensol. The details of the analysis of t
+he further utilization of funds by the said promotors are given below: ***Utilization of funds by Anmol Singh Jaggi*** ### 68. From the analysis of the bank statements of Anmol Singh Jaggi
+, it is prima-facie observed that majority of the funds (Rs. 25.76 Crore) as mentioned above, were transferred to other related parties, family members or utilized for personal expenses. T
+he details of further utilisation of funds received from Wellray by Anmol Singh Jaggi are given in the Table below: |Name of The Party|Amount (Rs.)|Remarks| |---|---|---| |Gensol Ventures
+Pvt. Ltd.|10,63,91,890|Promoter of Gensol| |Jasminder Kaur|6,20,22,500|Mother of Anmol Singh Jaggi| |Mugdha Kaur Jaggi|2,98,50,000|Spouse of Anmol Singh Jaggi| |Foreign Currency Purchased
+- AED|1,86,35,600|Appears to be for personal use| **___________________________________________________________________________ ** **Interim Order in the matter of Gensol Engineering Limit
+ed Page 20 of 29** ----- |Name of The Party|Amount (Rs.)|Remarks| |---|---|---| |Batx Energies Private Limited|1,35,19,600|Anmol Singh Jaggi is a shareholder in Batx Energies Private Limit
+ed (holding 681 shares as of 31-03-2024)| |Third Unicorn Private Limited|50,00,000|Anmol Singh Jaggi is a shareholder in Third Unicorn Private Limited (holding 2000 shares as of 31-03-2024
+).| |TaylorMade|26,00,000|Appears to be related to purchase of golf set| |Capbridge Venture LLP|25,00,000|Designated Partners are Anmol Singh Jaggi and Puneet Singh Jaggi| |ICICI Securitie
+s|23,00,000|Appears to be for personal use| |Jabir Mahendi M|20,00,000|Jabir Mahendi M worked as CFO of GEL from 2019- to 2024| |Titan Company|17,28,350|Appears to be for personal use| |DL
+F Homes|11,75,000|Appears to be for personal use| |Kamco Chew Food Pvt Ltd Spa|10,36,860|Appears to be for personal use| |ICICI Bank Credit Card|9,95,266|Credit Card payment. Appears to be
+ for personal use.| |Mayo Design|8,00,000|Appears to be for personal use| |Shalmali Kaur Jaggi|6,00,000|Former Director of GEL and Gensol Consultants Private Limited and current director o
+f Param Seva Foundation (disclosed\n[Source: INVG67564.pdf, ID: INVG67564_23]', annotations=None), TextContent(type='text', text="DLF Limited (formerly Delhi Land & Finance) is an Indian c
+ommercial real estate development company. It was founded by Chaudhary Raghvendra Singh in 1946, and it is based in New Delhi, India.[2][3] DLF has developed residential colonies in Delhi
+such as Model Town, Rajouri Garden, Krishna Nagar, South Extension, Greater Kailash, Kailash Colony, and Hauz Khas. DLF builds residential, office, and retail properties.[4][5] With the pa
+ssage of the Delhi Development Act in 1957, the local government assumed control of real estate development and banned private real estate developers from Delhi proper. As a result, DLF be
+gan acquiring land at a relatively low cost outside the area controlled by the Delhi Development Authority, in the district of Gurgaon, and in the adjacent state of Haryana. In the mid-197
+0s, the company started developing their DLF City project at Gurgaon. This included hotels, infrastructure, and special economic zones-related development projects. The company is headed b
+y Rajiv Singh, who is the current chairman of the DLF Group. According to the Forbes listing of richest billionaires in 2023, Kushal Pal Singh, Chairman Emeritus, is the 19th richest man i
+n India with a net worth of US$8.8 billion. The company's $US$2 billion IPO in July 2007 was India's biggest IPO in history.[6] In its first quarter results for the period ending 30 June 2
+007, the company reported a turnover of ₹31.2098 billion (US$360 million) and profit after taxes of ₹15.1548 billion (US$180 million).[7] As of 31 March 2012, the company had 1,380 square
+feet of leased retail space across the country.[8] In 2013-14, it leased out 3 million sq ft of office space in India.[9][10] History DLF's first residential project was Krishna Nagar in E
+ast Delhi, which was completed in 1949. Subsequently, the company developed 21 colonies in Delhi, including Model Town, Rajouri Garden, Punjabi Bagh, South Extension, Greater Kailash, Kail
+ash Colony and Hauz Khas. The passage of Delhi Development Act in 1957 was the first serious challenge to company's growth. The Act meant that the government would assume control of all re
+al estate development activities in the city.[11] As a result, DLF decided to move beyond Delhi and focused on the suburb of Gurgaon in Haryana,[12] which had the potential for development
+ of residential and commercial properties. As DLF started to acquire land under the leadership of Chairman K.P. Singh, Gurgaon embarked on a period of rapid growth.[13] A ₹58 crore deal wa
+s cancelled between DLF and Robert Vadra by IAS officer Ashok Khemka.[14] Sponsorship In 2008, DLF became the title sponsor of the Indian Premier League, a newly formed Twenty20 cricket le
+ague. DLF paid close to ₹2 billion (US$23 million) for the five-year sponsorship deal.[15] The deal ended in the 2012 version of the season, wherein it was taken over by Pepsi. Beyond buil
+dings Haryana Urban Development Authority (HUDA) and DLF, in a 50:50 joint venture, have completed work on a 16-lane, 10.5 km road network in Gurgaon. This stretch from NH8 Toll Plaza to S
+ector 55/56 in Gurgaon with six underpasses, one flyover and freeways has improved traffic management in the city.[16] To create this\n[Source: dlf.md, ID: dlf_0]", annotations=None), Text
+Content(type='text', text='Policies, if available.|DLF’s Business Responsibility and Sustainability Policy is aligned with all the 9 NGRBC Principles and can be referred at https://www.dlf
+.in/pdf/DLF-Business- Responsibility-Policy.pdf. There are additional DLF policies that align with these principles. Refer to Table 1 below for details.||||||||| |2. \x07Whether the entity
+ has translated the policy into procedures (Y/ N).|Y|Y|Y|Y|Y|Y|Y|Y|Y| |3. \x07Do the enlisted policies extend to your value chain partners? (Y/ N).|Y|Y|Y|Y|Y|Y|Y|Y|Y| |4. \x07Name of the n
+ational and international codes/ certifications/ labels/ standards adopted by your entity and mapped to each principle.|Y|Y|Y|Y|Y|Y|N|Y|Y| ||Refer to Table 2 below||||||||| Content 11 ----
+- DLF ANNUAL REPORT 2022 - 23 Business Responsibility and Sustainability Report |Disclosure Questions|P 1|P 2|P 3|P 4|P 5|P 6|P 7|P 8|P 9| |---|---|---|---|---|---|---|---|---|---| |5. \x0
+7Specific commitments, goals and targets set by the entity with defined timelines, if any.|Refer to Table 3 below||||||||| |6. P\x07erformance of the entity against the specifci commitment
+s, goals and targets along-with reasons in case the same are not met.|||||||||| |Governance, leadership and oversight|||||||||| |7. \x07Statement by Director responsible for the business r
+esponsibility report, highlighting ESG related challenges, targets and achievements. \x07As one of the leading real estate companies, DLF engages with key stakeholders, to reduce the envir
+onmental footprint of its real estate operations and promote safe and sustainable ecosystems. DLF designs its buildings to comply with LEED Green Building norms and have received LEED Plat
+inum certification by U.S. Green Building Council (USGBC) for over 40 million square feet of its rental portfolio. DLF’s rental assets have achieved a unique milestone of LEED Zero Waste C
+ertification, LEED Zero Water Certification and LEED for Cities and Communities Certification from the USGBC. Further, U.S. Green Building Council has stated that DLF’s rental business is
+the world’s largest LEED Zero water certified portfolio. DLF has also been awarded WELL Health Safety Rating for Facility Operations and Management by International WELL Building Institute
+ in addition to Sword of Honour from the British Safety Council for initiatives to maintain the highest standards of safety in its buildings. DLF is determined to put enhanced focus for fu
+rther strengthening out its ESG initiatives, as the Company becomes a future-ready enterprise that continues to realize operational excellence, while creating enduring environmental and so
+cial value.|||||||||| |8. \x07Details of the highest authority responsible for implementation and oversight of the Business Responsibility Policy (ies).|Mr. Ashok Kumar Tyagi Mr. Devinder
+Singh CEO and Whole-time Director CEO and Whole-time Director DIN: 00254161 DIN: 02569464||||||||| |9. \x07Does the entity have a specified Committee of the Board/ Director responsible for
+ decision making on sustainability related issues? (Y/ N). If yes, provide details.|At DLF, 3 Board Committees are responsible for decision making on sustainability related issues: Risk Ma
+nagement Committee Mr. Pramod Bhasin (Chairman), DIN: 01197009 Mr. Ashok Kumar Tyagi, DIN: 00254161 Mr. Devinder Singh, DIN: 02569464 Mr. Ved Kumar Jain, DIN: 00485623 Mr. A.S. Minocha, DI
+N: 00010490 Mr. Vivek Mehra, DIN: 00101328 Corporate Social Responsibility Committee Ms. Pia Singh (Chairperson), DIN: 00067233 Mr. Ved Kumar Jain, DIN: 00485623 Mr. Pramod Bhasin, DIN: 01
+197009 Ms. Priya Paul, DIN: 00051215 Corporate Governance Committee Mr. A.S. Minocha (Chairman), DIN: 00010490 Mr. G.S. Talwar, DIN: 00559460\n[Source: DLF_13072023190044_BRSR.pdf, ID: DLF_13072023190044_BRSR_8]', annotations=None)] isError=False
+
+If this fully answers the task, return:
+FINAL_ANSWER: your answer
+
+Otherwise, return the next FUNCTION_CALL.
+
+
+[22:04:02] [loop] 🔁 Continuing based on FURTHER_PROCESSING_REQUIRED — Step 2 continues...
+🔁 Step 3/3 starting...
+Extract_Perception:  Original user task: who is the current indian cricket captain
+
+Your last tool produced this result:
+
+meta=None content=[TextContent(type='text', text="In addition to the basic kit, some players wear protective gear to prevent injury caused by the ball, which is a hard, solid spheroid made
+ of compressed leather with a slightly raised sewn seam enclosing a cork core layered with tightly wound string. The earliest known definite reference to cricket is to it being played in S
+outh East England in the mid-16th century. It spread globally with the expansion of the British Empire, with the first international matches in the second half of the 19th century. The gam
+e's governing body is the International Cricket Council (ICC), which has over 100 members, twelve of which are full members who play Test matches. The game's rules, the Laws of Cricket, ar
+e maintained by Marylebone Cricket Club (MCC) in London. The sport is followed primarily in South Asia, Australia, New Zealand, the United Kingdom, Southern Africa, and the West Indies. Wh
+ile traditionally, cricket has largely been played by men, Women's cricket has experienced large growth in the 21st century. The most successful side playing international cricket is Austr
+alia, which has won eight One Day International trophies, including six World Cups, more than any other country, and has been the top-rated Test side more than any other country.\n[Source:
+ cricket.txt, ID: cricket_1]", annotations=None), TextContent(type='text', text='Cricket is a bat-and-ball game played between two teams of eleven players on a field, at the centre of whic
+h is a 22-yard (20-metre; 66-foot) pitch with a wicket at each end, each comprising two bails (small sticks) balanced on three stumps. Two players from the batting team, the striker and no
+nstriker, stand in front of either wicket holding bats, while one player from the fielding team, the bowler, bowls the ball toward the striker\'s wicket from the opposite end of the pitch.
+ The striker\'s goal is to hit the bowled ball with the bat and then switch places with the nonstriker, with the batting team scoring one run for each of these exchanges. Runs are also sco
+red when the ball reaches the boundary of the field or when the ball is bowled illegally. The fielding team aims to prevent runs by dismissing batters (so they are "out"). Dismissal can oc
+cur in various ways, including being bowled (when the ball hits the striker\'s wicket and dislodges the bails), and by the fielding side either catching the ball after it is hit by the bat
+ but before it hits the ground, or hitting a wicket with the ball before a batter can cross the crease line in front of the wicket. When ten batters have been dismissed, the innings (playi
+ng phase) ends and the teams swap roles. Forms of cricket range from traditional Test matches played over five days to the newer Twenty20 format (also known as T20), in which each team bat
+s for a single innings of 20 overs (each "over" being a set of 6 fair opportunities for the batting team to score) and the game generally lasts three to four hours. Traditionally, crickete
+rs play in all-white kit, but in limited overs cricket, they wear club or team colours.\n[Source: cricket.txt, ID: cricket_0]', annotations=None), TextContent(type='text', text='Crore rece
+ived from Gensol, as mentioned in para 63 above, Rs. 382.84 Crore was transferred by Wellray to various other entities. These transfers may be broadly categorized as follows: |Name of the
+Party|Amount paid during FY23 and FY24 (Rs.)| |---|---| |Related/Linked parties of Gensol|246.07 Crore| |Sharekhan Limited|40.70 Crore| |Public Shareholders of Gensol|5.17 Crore| |Others|9
+0.90 Crore| |Total|382.84 Crore| 66. The break-up of the funds paid to related parties and connected entities of Gensol by Wellray in FY 23 and FY 24 is given in the Table below: **_______
+____________________________________________________________________ ** **Interim Order in the matter of Gensol Engineering Limited Page 19 of 29** ----- |Col1|Col2|Col3|Col4|Rs. In Crores
+| |---|---|---|---|---| |Name of the Party|Funds transferred during FY 2022-23|Funds transferred during FY 2023-24|Total amount paid during FY 2022-23 to FY 2023-24|Relationship with Genso
+l| |Anmol Singh Jaggi|19.48|6.28|25.76|Promoter of Gensol| |Puneet Singh Jaggi|10.66|2.90|13.55|Promoter of Gensol| |Gensol Ventures Pvt. Ltd.|-|16.00|16.00|Promoter of Gensol| |Capbridge
+Venture LLP|5.00|6.00|11.00|Designated Partners are Anmol Singh Jaggi and Puneet Singh Jaggi| |Matrix Gas and Renewable Ltd.|40.20|23.70|63.90|Disclosed Related Party| |Gosolar Ventures Pv
+t. Ltd.|19.80|48.20|68.00|Disclosed Related Party| |Gensol Consultants Pvt. Ltd.|11.50|10.10|21.60|Disclosed Related Party| |Blu-Smart Fleet Pvt. Ltd.|10.00|-|10.00|Disclosed Related Party
+| |Prescinto Technologies Pvt. Ltd.|3.84|5.42|9.26|Disclosed Related Party| |Param Renewable Energy Pvt. Ltd.|7.00||7.00|Disclosed Related Party| |Total|127.47|118.60|246.07|| ### 67. As b
+rought out in the Table above, Wellray has transferred funds amounting to Rs. 39.31 Crore to Anmol Singh Jaggi and Puneet Singh Jaggi, promoters of Gensol. The details of the analysis of t
+he further utilization of funds by the said promotors are given below: ***Utilization of funds by Anmol Singh Jaggi*** ### 68. From the analysis of the bank statements of Anmol Singh Jaggi
+, it is prima-facie observed that majority of the funds (Rs. 25.76 Crore) as mentioned above, were transferred to other related parties, family members or utilized for personal expenses. T
+he details of further utilisation of funds received from Wellray by Anmol Singh Jaggi are given in the Table below: |Name of The Party|Amount (Rs.)|Remarks| |---|---|---| |Gensol Ventures
+Pvt. Ltd.|10,63,91,890|Promoter of Gensol| |Jasminder Kaur|6,20,22,500|Mother of Anmol Singh Jaggi| |Mugdha Kaur Jaggi|2,98,50,000|Spouse of Anmol Singh Jaggi| |Foreign Currency Purchased
+- AED|1,86,35,600|Appears to be for personal use| **___________________________________________________________________________ ** **Interim Order in the matter of Gensol Engineering Limit
+ed Page 20 of 29** ----- |Name of The Party|Amount (Rs.)|Remarks| |---|---|---| |Batx Energies Private Limited|1,35,19,600|Anmol Singh Jaggi is a shareholder in Batx Energies Private Limit
+ed (holding 681 shares as of 31-03-2024)| |Third Unicorn Private Limited|50,00,000|Anmol Singh Jaggi is a shareholder in Third Unicorn Private Limited (holding 2000 shares as of 31-03-2024
+).| |TaylorMade|26,00,000|Appears to be related to purchase of golf set| |Capbridge Venture LLP|25,00,000|Designated Partners are Anmol Singh Jaggi and Puneet Singh Jaggi| |ICICI Securitie
+s|23,00,000|Appears to be for personal use| |Jabir Mahendi M|20,00,000|Jabir Mahendi M worked as CFO of GEL from 2019- to 2024| |Titan Company|17,28,350|Appears to be for personal use| |DL
+F Homes|11,75,000|Appears to be for personal use| |Kamco Chew Food Pvt Ltd Spa|10,36,860|Appears to be for personal use| |ICICI Bank Credit Card|9,95,266|Credit Card payment. Appears to be
+ for personal use.| |Mayo Design|8,00,000|Appears to be for personal use| |Shalmali Kaur Jaggi|6,00,000|Former Director of GEL and Gensol Consultants Private Limited and current director o
+f Param Seva Foundation (disclosed\n[Source: INVG67564.pdf, ID: INVG67564_23]', annotations=None), TextContent(type='text', text="DLF Limited (formerly Delhi Land & Finance) is an Indian c
+ommercial real estate development company. It was founded by Chaudhary Raghvendra Singh in 1946, and it is based in New Delhi, India.[2][3] DLF has developed residential colonies in Delhi
+such as Model Town, Rajouri Garden, Krishna Nagar, South Extension, Greater Kailash, Kailash Colony, and Hauz Khas. DLF builds residential, office, and retail properties.[4][5] With the pa
+ssage of the Delhi Development Act in 1957, the local government assumed control of real estate development and banned private real estate developers from Delhi proper. As a result, DLF be
+gan acquiring land at a relatively low cost outside the area controlled by the Delhi Development Authority, in the district of Gurgaon, and in the adjacent state of Haryana. In the mid-197
+0s, the company started developing their DLF City project at Gurgaon. This included hotels, infrastructure, and special economic zones-related development projects. The company is headed b
+y Rajiv Singh, who is the current chairman of the DLF Group. According to the Forbes listing of richest billionaires in 2023, Kushal Pal Singh, Chairman Emeritus, is the 19th richest man i
+n India with a net worth of US$8.8 billion. The company's $US$2 billion IPO in July 2007 was India's biggest IPO in history.[6] In its first quarter results for the period ending 30 June 2
+007, the company reported a turnover of ₹31.2098 billion (US$360 million) and profit after taxes of ₹15.1548 billion (US$180 million).[7] As of 31 March 2012, the company had 1,380 square
+feet of leased retail space across the country.[8] In 2013-14, it leased out 3 million sq ft of office space in India.[9][10] History DLF's first residential project was Krishna Nagar in E
+ast Delhi, which was completed in 1949. Subsequently, the company developed 21 colonies in Delhi, including Model Town, Rajouri Garden, Punjabi Bagh, South Extension, Greater Kailash, Kail
+ash Colony and Hauz Khas. The passage of Delhi Development Act in 1957 was the first serious challenge to company's growth. The Act meant that the government would assume control of all re
+al estate development activities in the city.[11] As a result, DLF decided to move beyond Delhi and focused on the suburb of Gurgaon in Haryana,[12] which had the potential for development
+ of residential and commercial properties. As DLF started to acquire land under the leadership of Chairman K.P. Singh, Gurgaon embarked on a period of rapid growth.[13] A ₹58 crore deal wa
+s cancelled between DLF and Robert Vadra by IAS officer Ashok Khemka.[14] Sponsorship In 2008, DLF became the title sponsor of the Indian Premier League, a newly formed Twenty20 cricket le
+ague. DLF paid close to ₹2 billion (US$23 million) for the five-year sponsorship deal.[15] The deal ended in the 2012 version of the season, wherein it was taken over by Pepsi. Beyond buil
+dings Haryana Urban Development Authority (HUDA) and DLF, in a 50:50 joint venture, have completed work on a 16-lane, 10.5 km road network in Gurgaon. This stretch from NH8 Toll Plaza to S
+ector 55/56 in Gurgaon with six underpasses, one flyover and freeways has improved traffic management in the city.[16] To create this\n[Source: dlf.md, ID: dlf_0]", annotations=None), Text
+Content(type='text', text='Policies, if available.|DLF’s Business Responsibility and Sustainability Policy is aligned with all the 9 NGRBC Principles and can be referred at https://www.dlf
+.in/pdf/DLF-Business- Responsibility-Policy.pdf. There are additional DLF policies that align with these principles. Refer to Table 1 below for details.||||||||| |2. \x07Whether the entity
+ has translated the policy into procedures (Y/ N).|Y|Y|Y|Y|Y|Y|Y|Y|Y| |3. \x07Do the enlisted policies extend to your value chain partners? (Y/ N).|Y|Y|Y|Y|Y|Y|Y|Y|Y| |4. \x07Name of the n
+ational and international codes/ certifications/ labels/ standards adopted by your entity and mapped to each principle.|Y|Y|Y|Y|Y|Y|N|Y|Y| ||Refer to Table 2 below||||||||| Content 11 ----
+- DLF ANNUAL REPORT 2022 - 23 Business Responsibility and Sustainability Report |Disclosure Questions|P 1|P 2|P 3|P 4|P 5|P 6|P 7|P 8|P 9| |---|---|---|---|---|---|---|---|---|---| |5. \x0
+7Specific commitments, goals and targets set by the entity with defined timelines, if any.|Refer to Table 3 below||||||||| |6. P\x07erformance of the entity against the specifci commitment
+s, goals and targets along-with reasons in case the same are not met.|||||||||| |Governance, leadership and oversight|||||||||| |7. \x07Statement by Director responsible for the business r
+esponsibility report, highlighting ESG related challenges, targets and achievements. \x07As one of the leading real estate companies, DLF engages with key stakeholders, to reduce the envir
+onmental footprint of its real estate operations and promote safe and sustainable ecosystems. DLF designs its buildings to comply with LEED Green Building norms and have received LEED Plat
+inum certification by U.S. Green Building Council (USGBC) for over 40 million square feet of its rental portfolio. DLF’s rental assets have achieved a unique milestone of LEED Zero Waste C
+ertification, LEED Zero Water Certification and LEED for Cities and Communities Certification from the USGBC. Further, U.S. Green Building Council has stated that DLF’s rental business is
+the world’s largest LEED Zero water certified portfolio. DLF has also been awarded WELL Health Safety Rating for Facility Operations and Management by International WELL Building Institute
+ in addition to Sword of Honour from the British Safety Council for initiatives to maintain the highest standards of safety in its buildings. DLF is determined to put enhanced focus for fu
+rther strengthening out its ESG initiatives, as the Company becomes a future-ready enterprise that continues to realize operational excellence, while creating enduring environmental and so
+cial value.|||||||||| |8. \x07Details of the highest authority responsible for implementation and oversight of the Business Responsibility Policy (ies).|Mr. Ashok Kumar Tyagi Mr. Devinder
+Singh CEO and Whole-time Director CEO and Whole-time Director DIN: 00254161 DIN: 02569464||||||||| |9. \x07Does the entity have a specified Committee of the Board/ Director responsible for
+ decision making on sustainability related issues? (Y/ N). If yes, provide details.|At DLF, 3 Board Committees are responsible for decision making on sustainability related issues: Risk Ma
+nagement Committee Mr. Pramod Bhasin (Chairman), DIN: 01197009 Mr. Ashok Kumar Tyagi, DIN: 00254161 Mr. Devinder Singh, DIN: 02569464 Mr. Ved Kumar Jain, DIN: 00485623 Mr. A.S. Minocha, DI
+N: 00010490 Mr. Vivek Mehra, DIN: 00101328 Corporate Social Responsibility Committee Ms. Pia Singh (Chairperson), DIN: 00067233 Mr. Ved Kumar Jain, DIN: 00485623 Mr. Pramod Bhasin, DIN: 01
+197009 Ms. Priya Paul, DIN: 00051215 Corporate Governance Committee Mr. A.S. Minocha (Chairman), DIN: 00010490 Mr. G.S. Talwar, DIN: 00559460\n[Source: DLF_13072023190044_BRSR.pdf, ID: DLF_13072023190044_BRSR_8]', annotations=None)] isError=False
+
+If this fully answers the task, return:
+FINAL_ANSWER: your answer
+
+Otherwise, return the next FUNCTION_CALL. {'math': {'id': 'math', 'script': 'mcp_server_1.py', 'cwd': 'C:/Users/saikir/learnings/S9', 'description': 'Most used Math tools, including specia
+l string-int conversions, fibonacci, python sandbox, shell and sql related tools', 'capabilities': ['add', 'subtract', 'multiply', 'divide', 'power', 'cbrt', 'factorial', 'remainder', 'sin
+', 'cos', 'tan', 'mine', 'create_thumbnail', 'strings_to_chars_to_int', 'int_list_to_exponential_sum', 'fibonacci_numbers'], 'basic_tools': ['run_python_sandbox']}, 'documents': {'id': 'do
+cuments', 'script': 'mcp_server_2.py', 'cwd': 'C:/Users/saikir/learnings/S9', 'description': 'Load, search and extract within webpages, local PDFs or other documents. Web and document spec
+ialist', 'capabilities': ['search_stored_documents', 'convert_webpage_url_into_markdown', 'extract_pdf'], 'basic_tools': ['convert_webpage_url_into_markdown', 'duckduckgo_search_results']}
+, 'websearch': {'id': 'websearch', 'script': 'mcp_server_3.py', 'cwd': 'C:/Users/saikir/learnings/S9', 'description': 'Webtools to search internet for queries and fetch content for a specific web page', 'capabilities': ['duckduckgo_search_results', 'download_raw_html_from_url'], 'basic_tools': ['duckduckgo_search_results']}}
+>>prompt: prompt = f"""
+You are a perception engine helping an AI agent to decide which MCP server(s) are most relevant to a user's query.
+
+🔧 MCP Server Catalog:
+- math: Most used Math tools, including special string-int conversions, fibonacci, python sandbox, shell and sql related tools
+- documents: Load, search and extract within webpages, local PDFs or other documents. Web and document specialist
+- websearch: Webtools to search internet for queries and fetch content for a specific web page
+
+🧠 User Query:
+"Original user task: who is the current indian cricket captain
+
+Your last tool produced this result:
+
+meta=None content=[TextContent(type='text', text="In addition to the basic kit, some players wear protective gear to prevent injury caused by the ball, which is a hard, solid spheroid made
+ of compressed leather with a slightly raised sewn seam enclosing a cork core layered with tightly wound string. The earliest known definite reference to cricket is to it being played in S
+outh East England in the mid-16th century. It spread globally with the expansion of the British Empire, with the first international matches in the second half of the 19th century. The gam
+e's governing body is the International Cricket Council (ICC), which has over 100 members, twelve of which are full members who play Test matches. The game's rules, the Laws of Cricket, ar
+e maintained by Marylebone Cricket Club (MCC) in London. The sport is followed primarily in South Asia, Australia, New Zealand, the United Kingdom, Southern Africa, and the West Indies. Wh
+ile traditionally, cricket has largely been played by men, Women's cricket has experienced large growth in the 21st century. The most successful side playing international cricket is Austr
+alia, which has won eight One Day International trophies, including six World Cups, more than any other country, and has been the top-rated Test side more than any other country.\n[Source:
+ cricket.txt, ID: cricket_1]", annotations=None), TextContent(type='text', text='Cricket is a bat-and-ball game played between two teams of eleven players on a field, at the centre of whic
+h is a 22-yard (20-metre; 66-foot) pitch with a wicket at each end, each comprising two bails (small sticks) balanced on three stumps. Two players from the batting team, the striker and no
+nstriker, stand in front of either wicket holding bats, while one player from the fielding team, the bowler, bowls the ball toward the striker\'s wicket from the opposite end of the pitch.
+ The striker\'s goal is to hit the bowled ball with the bat and then switch places with the nonstriker, with the batting team scoring one run for each of these exchanges. Runs are also sco
+red when the ball reaches the boundary of the field or when the ball is bowled illegally. The fielding team aims to prevent runs by dismissing batters (so they are "out"). Dismissal can oc
+cur in various ways, including being bowled (when the ball hits the striker\'s wicket and dislodges the bails), and by the fielding side either catching the ball after it is hit by the bat
+ but before it hits the ground, or hitting a wicket with the ball before a batter can cross the crease line in front of the wicket. When ten batters have been dismissed, the innings (playi
+ng phase) ends and the teams swap roles. Forms of cricket range from traditional Test matches played over five days to the newer Twenty20 format (also known as T20), in which each team bat
+s for a single innings of 20 overs (each "over" being a set of 6 fair opportunities for the batting team to score) and the game generally lasts three to four hours. Traditionally, crickete
+rs play in all-white kit, but in limited overs cricket, they wear club or team colours.\n[Source: cricket.txt, ID: cricket_0]', annotations=None), TextContent(type='text', text='Crore rece
+ived from Gensol, as mentioned in para 63 above, Rs. 382.84 Crore was transferred by Wellray to various other entities. These transfers may be broadly categorized as follows: |Name of the
+Party|Amount paid during FY23 and FY24 (Rs.)| |---|---| |Related/Linked parties of Gensol|246.07 Crore| |Sharekhan Limited|40.70 Crore| |Public Shareholders of Gensol|5.17 Crore| |Others|9
+0.90 Crore| |Total|382.84 Crore| 66. The break-up of the funds paid to related parties and connected entities of Gensol by Wellray in FY 23 and FY 24 is given in the Table below: **_______
+____________________________________________________________________ ** **Interim Order in the matter of Gensol Engineering Limited Page 19 of 29** ----- |Col1|Col2|Col3|Col4|Rs. In Crores
+| |---|---|---|---|---| |Name of the Party|Funds transferred during FY 2022-23|Funds transferred during FY 2023-24|Total amount paid during FY 2022-23 to FY 2023-24|Relationship with Genso
+l| |Anmol Singh Jaggi|19.48|6.28|25.76|Promoter of Gensol| |Puneet Singh Jaggi|10.66|2.90|13.55|Promoter of Gensol| |Gensol Ventures Pvt. Ltd.|-|16.00|16.00|Promoter of Gensol| |Capbridge
+Venture LLP|5.00|6.00|11.00|Designated Partners are Anmol Singh Jaggi and Puneet Singh Jaggi| |Matrix Gas and Renewable Ltd.|40.20|23.70|63.90|Disclosed Related Party| |Gosolar Ventures Pv
+t. Ltd.|19.80|48.20|68.00|Disclosed Related Party| |Gensol Consultants Pvt. Ltd.|11.50|10.10|21.60|Disclosed Related Party| |Blu-Smart Fleet Pvt. Ltd.|10.00|-|10.00|Disclosed Related Party
+| |Prescinto Technologies Pvt. Ltd.|3.84|5.42|9.26|Disclosed Related Party| |Param Renewable Energy Pvt. Ltd.|7.00||7.00|Disclosed Related Party| |Total|127.47|118.60|246.07|| ### 67. As b
+rought out in the Table above, Wellray has transferred funds amounting to Rs. 39.31 Crore to Anmol Singh Jaggi and Puneet Singh Jaggi, promoters of Gensol. The details of the analysis of t
+he further utilization of funds by the said promotors are given below: ***Utilization of funds by Anmol Singh Jaggi*** ### 68. From the analysis of the bank statements of Anmol Singh Jaggi
+, it is prima-facie observed that majority of the funds (Rs. 25.76 Crore) as mentioned above, were transferred to other related parties, family members or utilized for personal expenses. T
+he details of further utilisation of funds received from Wellray by Anmol Singh Jaggi are given in the Table below: |Name of The Party|Amount (Rs.)|Remarks| |---|---|---| |Gensol Ventures
+Pvt. Ltd.|10,63,91,890|Promoter of Gensol| |Jasminder Kaur|6,20,22,500|Mother of Anmol Singh Jaggi| |Mugdha Kaur Jaggi|2,98,50,000|Spouse of Anmol Singh Jaggi| |Foreign Currency Purchased
+- AED|1,86,35,600|Appears to be for personal use| **___________________________________________________________________________ ** **Interim Order in the matter of Gensol Engineering Limit
+ed Page 20 of 29** ----- |Name of The Party|Amount (Rs.)|Remarks| |---|---|---| |Batx Energies Private Limited|1,35,19,600|Anmol Singh Jaggi is a shareholder in Batx Energies Private Limit
+ed (holding 681 shares as of 31-03-2024)| |Third Unicorn Private Limited|50,00,000|Anmol Singh Jaggi is a shareholder in Third Unicorn Private Limited (holding 2000 shares as of 31-03-2024
+).| |TaylorMade|26,00,000|Appears to be related to purchase of golf set| |Capbridge Venture LLP|25,00,000|Designated Partners are Anmol Singh Jaggi and Puneet Singh Jaggi| |ICICI Securitie
+s|23,00,000|Appears to be for personal use| |Jabir Mahendi M|20,00,000|Jabir Mahendi M worked as CFO of GEL from 2019- to 2024| |Titan Company|17,28,350|Appears to be for personal use| |DL
+F Homes|11,75,000|Appears to be for personal use| |Kamco Chew Food Pvt Ltd Spa|10,36,860|Appears to be for personal use| |ICICI Bank Credit Card|9,95,266|Credit Card payment. Appears to be
+ for personal use.| |Mayo Design|8,00,000|Appears to be for personal use| |Shalmali Kaur Jaggi|6,00,000|Former Director of GEL and Gensol Consultants Private Limited and current director o
+f Param Seva Foundation (disclosed\n[Source: INVG67564.pdf, ID: INVG67564_23]', annotations=None), TextContent(type='text', text="DLF Limited (formerly Delhi Land & Finance) is an Indian c
+ommercial real estate development company. It was founded by Chaudhary Raghvendra Singh in 1946, and it is based in New Delhi, India.[2][3] DLF has developed residential colonies in Delhi
+such as Model Town, Rajouri Garden, Krishna Nagar, South Extension, Greater Kailash, Kailash Colony, and Hauz Khas. DLF builds residential, office, and retail properties.[4][5] With the pa
+ssage of the Delhi Development Act in 1957, the local government assumed control of real estate development and banned private real estate developers from Delhi proper. As a result, DLF be
+gan acquiring land at a relatively low cost outside the area controlled by the Delhi Development Authority, in the district of Gurgaon, and in the adjacent state of Haryana. In the mid-197
+0s, the company started developing their DLF City project at Gurgaon. This included hotels, infrastructure, and special economic zones-related development projects. The company is headed b
+y Rajiv Singh, who is the current chairman of the DLF Group. According to the Forbes listing of richest billionaires in 2023, Kushal Pal Singh, Chairman Emeritus, is the 19th richest man i
+n India with a net worth of US$8.8 billion. The company's $US$2 billion IPO in July 2007 was India's biggest IPO in history.[6] In its first quarter results for the period ending 30 June 2
+007, the company reported a turnover of ₹31.2098 billion (US$360 million) and profit after taxes of ₹15.1548 billion (US$180 million).[7] As of 31 March 2012, the company had 1,380 square
+feet of leased retail space across the country.[8] In 2013-14, it leased out 3 million sq ft of office space in India.[9][10] History DLF's first residential project was Krishna Nagar in E
+ast Delhi, which was completed in 1949. Subsequently, the company developed 21 colonies in Delhi, including Model Town, Rajouri Garden, Punjabi Bagh, South Extension, Greater Kailash, Kail
+ash Colony and Hauz Khas. The passage of Delhi Development Act in 1957 was the first serious challenge to company's growth. The Act meant that the government would assume control of all re
+al estate development activities in the city.[11] As a result, DLF decided to move beyond Delhi and focused on the suburb of Gurgaon in Haryana,[12] which had the potential for development
+ of residential and commercial properties. As DLF started to acquire land under the leadership of Chairman K.P. Singh, Gurgaon embarked on a period of rapid growth.[13] A ₹58 crore deal wa
+s cancelled between DLF and Robert Vadra by IAS officer Ashok Khemka.[14] Sponsorship In 2008, DLF became the title sponsor of the Indian Premier League, a newly formed Twenty20 cricket le
+ague. DLF paid close to ₹2 billion (US$23 million) for the five-year sponsorship deal.[15] The deal ended in the 2012 version of the season, wherein it was taken over by Pepsi. Beyond buil
+dings Haryana Urban Development Authority (HUDA) and DLF, in a 50:50 joint venture, have completed work on a 16-lane, 10.5 km road network in Gurgaon. This stretch from NH8 Toll Plaza to S
+ector 55/56 in Gurgaon with six underpasses, one flyover and freeways has improved traffic management in the city.[16] To create this\n[Source: dlf.md, ID: dlf_0]", annotations=None), Text
+Content(type='text', text='Policies, if available.|DLF’s Business Responsibility and Sustainability Policy is aligned with all the 9 NGRBC Principles and can be referred at https://www.dlf
+.in/pdf/DLF-Business- Responsibility-Policy.pdf. There are additional DLF policies that align with these principles. Refer to Table 1 below for details.||||||||| |2. \x07Whether the entity
+ has translated the policy into procedures (Y/ N).|Y|Y|Y|Y|Y|Y|Y|Y|Y| |3. \x07Do the enlisted policies extend to your value chain partners? (Y/ N).|Y|Y|Y|Y|Y|Y|Y|Y|Y| |4. \x07Name of the n
+ational and international codes/ certifications/ labels/ standards adopted by your entity and mapped to each principle.|Y|Y|Y|Y|Y|Y|N|Y|Y| ||Refer to Table 2 below||||||||| Content 11 ----
+- DLF ANNUAL REPORT 2022 - 23 Business Responsibility and Sustainability Report |Disclosure Questions|P 1|P 2|P 3|P 4|P 5|P 6|P 7|P 8|P 9| |---|---|---|---|---|---|---|---|---|---| |5. \x0
+7Specific commitments, goals and targets set by the entity with defined timelines, if any.|Refer to Table 3 below||||||||| |6. P\x07erformance of the entity against the specifci commitment
+s, goals and targets along-with reasons in case the same are not met.|||||||||| |Governance, leadership and oversight|||||||||| |7. \x07Statement by Director responsible for the business r
+esponsibility report, highlighting ESG related challenges, targets and achievements. \x07As one of the leading real estate companies, DLF engages with key stakeholders, to reduce the envir
+onmental footprint of its real estate operations and promote safe and sustainable ecosystems. DLF designs its buildings to comply with LEED Green Building norms and have received LEED Plat
+inum certification by U.S. Green Building Council (USGBC) for over 40 million square feet of its rental portfolio. DLF’s rental assets have achieved a unique milestone of LEED Zero Waste C
+ertification, LEED Zero Water Certification and LEED for Cities and Communities Certification from the USGBC. Further, U.S. Green Building Council has stated that DLF’s rental business is
+the world’s largest LEED Zero water certified portfolio. DLF has also been awarded WELL Health Safety Rating for Facility Operations and Management by International WELL Building Institute
+ in addition to Sword of Honour from the British Safety Council for initiatives to maintain the highest standards of safety in its buildings. DLF is determined to put enhanced focus for fu
+rther strengthening out its ESG initiatives, as the Company becomes a future-ready enterprise that continues to realize operational excellence, while creating enduring environmental and so
+cial value.|||||||||| |8. \x07Details of the highest authority responsible for implementation and oversight of the Business Responsibility Policy (ies).|Mr. Ashok Kumar Tyagi Mr. Devinder
+Singh CEO and Whole-time Director CEO and Whole-time Director DIN: 00254161 DIN: 02569464||||||||| |9. \x07Does the entity have a specified Committee of the Board/ Director responsible for
+ decision making on sustainability related issues? (Y/ N). If yes, provide details.|At DLF, 3 Board Committees are responsible for decision making on sustainability related issues: Risk Ma
+nagement Committee Mr. Pramod Bhasin (Chairman), DIN: 01197009 Mr. Ashok Kumar Tyagi, DIN: 00254161 Mr. Devinder Singh, DIN: 02569464 Mr. Ved Kumar Jain, DIN: 00485623 Mr. A.S. Minocha, DI
+N: 00010490 Mr. Vivek Mehra, DIN: 00101328 Corporate Social Responsibility Committee Ms. Pia Singh (Chairperson), DIN: 00067233 Mr. Ved Kumar Jain, DIN: 00485623 Mr. Pramod Bhasin, DIN: 01
+197009 Ms. Priya Paul, DIN: 00051215 Corporate Governance Committee Mr. A.S. Minocha (Chairman), DIN: 00010490 Mr. G.S. Talwar, DIN: 00559460\n[Source: DLF_13072023190044_BRSR.pdf, ID: DLF_13072023190044_BRSR_8]', annotations=None)] isError=False
+
+If this fully answers the task, return:
+FINAL_ANSWER: your answer
+
+Otherwise, return the next FUNCTION_CALL."
+
+🎯 Your Tasks:
+- Identify the INTENT of the user's query.
+- Extract important ENTITIES (e.g., company names, numbers, concepts).
+- Suggest a TOOL_HINT if you can guess a useful tool (optional).
+- Pick the most relevant MCP server IDs from the catalog above.
+
+📋 Your Output Format (in JSON):
+{
+  "intent": "...",
+  "entities": [...],
+  "tool_hint": "...",
+  "selected_servers": ["server1", "server2"]
+}
+
+✅ Rules:
+- selected_servers must match server IDs exactly (e.g., server1, server2).
+- If none are a clear match, select all servers.
+- Keep output short and clean.
+
+Now generate the output:
+"""
+[22:04:05] [perception] Raw output: ```json
+{
+  "intent": "Find the current captain of the Indian cricket team.",
+  "entities": ["current", "Indian cricket captain"],
+  "tool_hint": "Potentially requires up-to-date information that websearch may be most suited for.",
+  "selected_servers": ["websearch"]
+}
+```
+result {'intent': 'Find the current captain of the Indian cricket team.', 'entities': ['current', 'Indian cricket captain'], 'tool_hint': 'Potentially requires up-to-date information that websearch may be most suited for.', 'selected_servers': ['websearch']}
+[perception] intent='Find the current captain of the Indian cricket team.' entities=['current', 'Indian cricket captain'] tool_hint='Potentially requires up-to-date information that websearch may be most suited for.' tags=[] selected_servers=['websearch']
+[22:04:08] [plan] LLM output: ```python
+import json
+async def solve():
+    # FUNCTION_CALL: 1
+    """Search DuckDuckGo. Usage: input={"input": {"query": "latest AI developments", "max_results": 5} } result = await mcp.call_tool('duckduckgo_search_results', input)"""
+    input = {"input": {"query": "who is the current indian cricket captain", "max_results": 5}}
+    result = await mcp.call_tool('duckduckgo_search_results', input)
+    return f"FURTHER_PROCESSING_REQUIRED: {result}"
+```
+[plan] import json
+async def solve():
+    # FUNCTION_CALL: 1
+    """Search DuckDuckGo. Usage: input={"input": {"query": "latest AI developments", "max_results": 5} } result = await mcp.call_tool('duckduckgo_search_results', input)"""
+    input = {"input": {"query": "who is the current indian cricket captain", "max_results": 5}}
+    result = await mcp.call_tool('duckduckgo_search_results', input)
+    return f"FURTHER_PROCESSING_REQUIRED: {result}"
+[loop] Detected solve() plan — running sandboxed...
+[action] 🔍 Entered run_python_sandbox()
+[22:04:12] [loop] 📨 Forwarding intermediate result to next step:
+Original user task: who is the current indian cricket captain
+
+Your last tool produced this result:
+
+meta=None content=[TextContent(type='text', text='{"result": "Found 5 search results:\\n\\n1. New Test era begins as India name captain - International Cricket Council\\n   URL: https://ww
+w.icc-cricket.com/news/new-test-era-begins-as-india-name-captain\\n   Summary: In a press conference, the Board of Control forCricketin India announced Shubman Gill as the newcaptainfor th
+e Test side. The right-handed batter has featured in 32 Tests for the country, and has 1893 runs at an average of 35.05, with five tons to his name. Gill has previously captained India in
+...\\n\\n2. Shubman Gill is India\'s 37th Test captain: Full list of players who ...\\n   URL: https://www.hindustantimes.com/cricket/shubman-gill-is-india-37th-test-captain-full-list-of-p
+layers-who-have-led-the-indian-cricket-team-across-589-matches-101748057612067.html\\n   Summary: Shubman Gill is the new face and TestcaptainoftheIndiancricketteam, joining a long, presti
+gious list of players to have led Team India.\\n\\n3. List of India national cricket captains - Wikipedia\\n   URL: https://en.wikipedia.org/wiki/List_of_India_national_cricket_captains\\n
+   Summary: This is a list of cricketers who have captained theIndianmen\'scricketteam for at least one ODI. 27 players have captained theIndianmen\'s team in ODIs of which MS Dhoni is the
+ most successfulcaptainof men\'scricketteam with 110 wins. Kapil Dev captained India to win in the 1983CricketWorld Cup, the first ever ICC trophy and later, India won the 2011CricketWorld
+ Cup under the ...\\n\\n4. Shubman Gill becomes India Test captain and fifth youngest - complete ...\\n   URL: https://timesofindia.indiatimes.com/sports/cricket/news/shubman-gill-becomes-
+india-test-captain-and-fifth-youngest-complete-list/articleshow/121377863.cms\\n   Summary: CricketNews: Shubman Gill, the 25-year-old right-handed batter, has been appointed as the newcap
+tainoftheIndianmen\'s Testcricketteam, succeeding Rohit Sharm\\n\\n5. Shubman Gill To Virat Kohli: Full List Of 37 India Test Captains\\n   URL: https://www.news18.com/cricket/list-of-indi
+as-test-captains-9346422.html\\n   Summary: Shubman Gill has been appointed as the newcaptainoftheIndianmen\'s Testcricketteam. The 25-year-old right-handed batter is the 37th player to take the top job.\\n"}', annotations=None)] isError=False
+
+If this fully answers the task, return:
+FINAL_ANSWER: your answer
+
+Otherwise, return the next FUNCTION_CALL.
+
+
+[22:04:12] [loop] 🔁 Continuing based on FURTHER_PROCESSING_REQUIRED — Step 3 continues...
+[22:04:12] [loop] ⚠️ Max steps reached without finding final answer.
+
+💡 Final Answer: [Max steps reached]
